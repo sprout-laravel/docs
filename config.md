@@ -74,7 +74,7 @@ The third and final option in the sprout config file is `services`, which contai
 
 You can add, remove and rearrange this list dependent on the requirements of your application. 
 
-> [!INFO]
+> [!TIP]
 > You can read more about service overrides here.
 
 ## Multitenancy Config
@@ -100,7 +100,7 @@ There are three child options within this.
 ### Tenancies
 The next option is `tenancies`, which is Sprouts version of `auth.guards`. Sprout supports multiple tenancies, meaning, you can have an application that contains two kinds of distinct tenants, though in almost everyone’s case, a single tenancy type will do. 
 
-> [!INFO]
+> [!TIP]
 > You can read more about tenancies here.
 
 All tenancies have a name, which is used as the array key within this section, as well as the value for the default tenancy. The default value is as follows:
@@ -124,13 +124,13 @@ Within an individual tenancy config, you can also provide the `provider` option,
 #### Tenancy Options
 When configuring a tenancy you can also provide the `options` option, which should be an array of values provided by `Sprout\Contracts\Tenancy\TenancyOptions`. These options will define the behaviour of various elements of Sprout for a given tenancy.
 
-> [!INFO]
+> [!TIP]
 > You can read more about tenancy options here.
 
 ### Tenant Providers
 Next we have the `providers` option, which is used to configure the tenant providers for Sprout, similar to `auth.providers`. Tenant providers are responsible for retrieving your configured instances of the `Sprout\Contracts\Tenant` interface, by their identifier or key.
 
-> [!INFO]
+> [!TIP]
 > You can read more about tenant providers here.
 
 All tenant providers have a name, which is used as the array key within this section, as well as the value for the default provider, and a tenancy’s provider. The default value is as follows:
@@ -150,13 +150,13 @@ All tenant providers have a name, which is used as the array key within this sec
 
 When configuring a tenant provider, you must provide a `driver`, and the specific driver used will decide which other options are required. 
 
-> [!INFO]
+> [!TIP]
 > You can read more about tenant provider drivers here.
 
 ### Identity Resolvers
 The final option in here is `resolvers`, which doesn’t actually have a cousin in the auth config. Identity resolvers are abstracted logic responsible for retrieving a tenant's identity from a request or route.
 
-> [!INFO]
+> [!TIP]
 > You can read more about identity resolvers here.
 
 Much like with tenancies and tenant providers, all identity resolvers have a name, which is used as the array key within this section, as well as the value for the default resolver.
@@ -187,7 +187,7 @@ Much like with tenancies and tenant providers, all identity resolvers have a nam
 
 Again, similar to when configuring a tenant provider, identity resolvers must have a `driver`, and the specific driver used will decide which other options are required.
 
-> [!INFO]
+> [!TIP]
 > You can read more about identity resolver drivers here.
 
 [1]:	#configuring-sprout
