@@ -17,7 +17,7 @@ Sprout can be installed by simply requiring the package through composer.
 composer require sprout/sprout
 ```
 
-> [!WARNING]()
+> [!WARNING]
 > Sprout is currently in development, so if your composer is set to require stable releases, you won’t be able to install it until v1 launch.
 
 ### Publish Assets
