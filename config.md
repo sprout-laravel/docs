@@ -1,19 +1,14 @@
+---
+section: Getting Started
+title: Configuration
+position: 1
+---
 # Config
-- [Configuring Sprout][1]
-- [Sprout Config][2]
-	- [Supported Resolution Hooks][3]
-	- [Tenancy Bootstrappers][4]
-	- [Service Overrides][5]
-- [Multitenancy Config][6]
-	- [Defaults][7]
-	- [Tenancies][8]
-		- [Tenancy Provider][9]
-		- [Tenancy Options][10]
-	- [Tenant Providers][11]
-	- [Identity Resolvers][12]
+
+[[TOC]]
 
 ## Configuring Sprout
-Sprout comes with two sets of config, one that lets you configure Sprout itself, and one that lets you configure and control the implementation of multitenancy within your Laravel application. 
+Sprout comes with two sets of config, one that lets you configure Sprout itself, and one that lets you configure and control the implementation of multitenancy within your Laravel application.
 
 The decision to use two config files, rather than one, was made to provide a level of separation between the two, rather than have one file where you configure the package and its implementation.
 
@@ -72,7 +67,7 @@ The third and final option in the sprout config file is `services`, which contai
 ],
 ```
 
-You can add, remove and rearrange this list dependent on the requirements of your application. 
+You can add, remove and rearrange this list dependent on the requirements of your application.
 
 > [!TIP]
 > You can read more about service overrides here.
@@ -98,7 +93,7 @@ There are three child options within this.
 - `resolver` — This contains the name of an identity resolver configured in `multitenancy.resolvers`.
 
 ### Tenancies
-The next option is `tenancies`, which is Sprouts version of `auth.guards`. Sprout supports multiple tenancies, meaning, you can have an application that contains two kinds of distinct tenants, though in almost everyone’s case, a single tenancy type will do. 
+The next option is `tenancies`, which is Sprouts version of `auth.guards`. Sprout supports multiple tenancies, meaning, you can have an application that contains two kinds of distinct tenants, though in almost everyone’s case, a single tenancy type will do.
 
 > [!TIP]
 > You can read more about tenancies here.
@@ -148,7 +143,7 @@ All tenant providers have a name, which is used as the array key within this sec
 ],
 ```
 
-When configuring a tenant provider, you must provide a `driver`, and the specific driver used will decide which other options are required. 
+When configuring a tenant provider, you must provide a `driver`, and the specific driver used will decide which other options are required.
 
 > [!TIP]
 > You can read more about tenant provider drivers here.
@@ -189,16 +184,3 @@ Again, similar to when configuring a tenant provider, identity resolvers must ha
 
 > [!TIP]
 > You can read more about identity resolver drivers here.
-
-[1]:	#configuring-sprout
-[2]:	#sprout-config
-[3]:	#supported-resolution-hooks
-[4]:	#tenancy-bootstrappers
-[5]:	#service-overrides
-[6]:	#multitenancy-config
-[7]:	#defaults
-[8]:	#tenancies
-[9]:	#tenancy-provider
-[10]:	#tenancy-options
-[11]:	#tenant-providers
-[12]:	#identity-resolvers
