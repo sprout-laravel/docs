@@ -160,7 +160,9 @@ but, like with Laravel's auth functionality, this allows you to skip the manual 
 
 Now that you're all configured, and you have your tenant,
 whether that's an Eloquent model or something else, you're almost ready to start building.
-Sprout adds a helper method to the `Route` facade that makes creating tenanted routes simple.
+Whatever you're building, you're most likely going to need some routes that require a tenant.
+
+Fortunately, Sprout adds a helper method to the `Route` facade that makes creating tenanted routes simple.
 
 ```php
 Route::tenanted(function () {
