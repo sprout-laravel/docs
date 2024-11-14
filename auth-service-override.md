@@ -1,8 +1,8 @@
 ---
 section: Service Overrides
-title: Cache
-position: 2
-slug: cache
+title: Auth
+position: 3
+slug: auth-service-override
 description: 
   The Description
 ---

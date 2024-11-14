@@ -1,8 +1,8 @@
 ---
 section: Service Overrides
-title: Cookies
-position: 4
-slug: cookies
+title: Cache
+position: 2
+slug: cache-service-override
 description: 
   The Description
 ---
