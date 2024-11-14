@@ -13,17 +13,17 @@ description:
 
 Sprout has three requirements.
 
-- PHP - 8.2 (`^8.2`)
-- Laravel - 11.31 (`^11.31`)
-- [Flysystem Path Prefixing](https://packagist.org/packages/league/flysystem-path-prefixing) - 3.0 (`^3.0`)
+- PHP — 8.2 (`^8.2`)
+- Laravel — 11.31 (`^11.31`)
+- [Flysystem Path Prefixing][1] — 3.0 (`^3.0`)
 
 > [!NOTE]
-> The flysystem path prefixing package is only there for tenant-aware storage drives that prefix the path.
+> The flysystem path prefixing package is only there for tenant-aware storage disks that prefix the path.
 > The decision was made to include it by default to avoid additional installation steps.
 
 ## Install with Composer
 
-Sprout is available on [packagist](https://packagist.org/packages/sprout/sprout) and can be installed through Composer.
+Sprout is available on [packagist][2] and can be installed through Composer.
 
 ```shell
 composer require sprout/sprout
@@ -42,11 +42,11 @@ php artisan vendor:publish --provider="Sprout\\SproutServiceProvider"
 
 ## Next Steps
 
-Now that you have Sprout installed and the config files published, you can start configuring and implementing Sprout.
-Before you move on though, you'll want to figure out your answers to the following questions.
+Now that you have Sprout installed, and the config files published, you can start configuring and implementing Sprout.
+Before you move on though, you'll want to figure out your answers to the following questions:
 
-- Which of Laravels default services/features do I want to be tenant-aware?
-- How do I want tenants to be identified? Using a subdomain? HTTP header? Session? etc...
+- Which of Laravel's default services/features do I want to be tenant-aware?
+- How do I want tenants to be identified? Using a subdomain? HTTP header? Session? Etc…
 - What are my tenants? Are they Eloquent models or something else?
 
 Your answers to these questions will help point you in the right direction for not only using Sprout,
@@ -59,21 +59,21 @@ but will most likely include these.
 ### Configure Sprouts Core
 
 Sprout comes with two config files,
-and the best one to start with is the one that [configures Sprout itself](configuration#sprout-config).
+and the best one to start with is the one that [configures Sprout itself][3].
 There are three options in here, though there's only really one that you should care about at this point.
 
 #### Enable Service Overrides
 
 Within the `sprout.php` config file, right at the bottom, is an option called `services`.
-This is an array that contains the [service override](service-overrides) classes that should be enabled.
+This is an array that contains the [service override][4] classes that should be enabled.
 Sprout ships with the following service overrides:
 
-- [Storage](storage)
-- [Jobs](jobs)
-- [Cache](cache)
-- [Auth](auth)
-- [Cookies](cookies)
-- [Sessions](sessions)
+- [Storage][5]
+- [Jobs][6]
+- [Cache][7]
+- [Auth][8]
+- [Cookies][9]
+- [Sessions][10]
 
 By default, all are enabled and in an appropriate order.
 Since you've already asked yourself which parts of Laravel need to be made tenant-aware,
@@ -81,32 +81,32 @@ you'll know which to comment out/delete, if any.
 
 > [!TIP]
 > If there's an additional part of Laravel that isn't covered here,
-> you can look at [creating a custom one](custom-service-override).
+> you can look at [creating a custom one][11].
 
 ### Configure your Multitenancy
 
-The second config file that comes with Sprout is the [multitenancy config](configuration#multitenancy-config),
+The second config file that comes with Sprout is the [multitenancy config][12],
 which lets you configure your implementation.
 
 #### Configure your Identity Resolver
 
-Within the `multitenancy.php` config file there is an option `resolver`,
-which, by default contains a resolver for all the default drivers.
+Within the `multitenancy.php` config file, there is an option `resolver`,
+which, by default, contains a resolver for all the default drivers.
 These resolvers are used to resolve a tenant's identifier from a route or request,
-which each drivers name reflecting where in the request it expects to find it.
+with each driver's name reflecting where in the request it expects to find it.
 
 The default drivers are as follows:
 
 > [!WARNING]
-> Some of the identity resolvers will have limitations and restrictions regarding other features within Sprout or
+> Some identity resolvers will have limitations and restrictions regarding other features within Sprout or
 > Laravel itself.
 > Please read the documentation of your choice in full.
 
-- [Subdomain](subdomain)
-- [Path](path)
-- [Header](header)
-- [Cookie](cookie)
-- [Session](session)
+- [Subdomain][13]
+- [Path][14]
+- [Header][15]
+- [Cookie][16]
+- [Session][17]
 
 > [!TIP]
 > For simplicity, it is recommended that you remove any that you don't currently need.
@@ -120,17 +120,17 @@ whether it's an Eloquent model, simply entity, or something else.
 
 > [!TIP]
 > The tenant provider functionality is mirrored on
-> Laravels [auth user provider](https://laravel.com/docs/11.x/authentication#adding-custom-user-providers) functionality.
+> Laravel's [auth user provider][18] functionality.
 
 The default drivers are as follows:
 
-- [Eloquent](eloquent)
-- [Database](database)
+- [Eloquent][19]
+- [Database][20]
 
-For most people, their tenant will be an [Eloquent model](tenant-models).
+For most people, their tenant will be an [Eloquent model][21].
 
 > [!TIP]
-> Should you wish to use something else as your tenant, you can look into [creating a custom tenant provider](custom-tenant-provider).
+> Should you wish to use something else as your tenant, you can look into [creating a custom tenant provider][22].
 
 #### Configure your Tenancy
 
@@ -139,20 +139,20 @@ you can finally configure your tenancy within the `tenancies` option inside the 
 Tenancies are the different types of tenants your application has, and for most people, there will be only one.
 
 > [!TIP]
-> The tenancies functionality is mirrored on
-> Laravels [auth guard](https://laravel.com/docs/11.x/authentication#adding-custom-guards) functionality.
+> The tenancies' functionality is mirrored on
+> Laravel's [auth guard][23] functionality.
 
 For your tenancy,
-you'll want to set the provider you're using which will be the one from the previous step,
-as well as the [tenancy options](configuration#tenancy-options).
-The tenancy options configure some of the base functionality and behaviour of a tenancy.
+you'll want to set the provider you're using, which will be the one from the previous step,
+as well as the [tenancy options][24].
+The tenancy options configure some base functionality and behaviour of a tenancy.
 You can read more about those in the configuration part of the documentation,
 but for most people, the default ones you see should suffice.
 
 #### Set the defaults
 
 Finally, you'll want to go to the `defaults` option within the `multitenancy.php` file,
-and update each with the name of the resolver, provider and tenancy you just configured.
+and update each with the name of the resolver, provider, and tenancy you just configured.
 This step is entirely optional,
 but, like with Laravel's auth functionality, this allows you to skip the manual providing of configuration names.
 
@@ -198,7 +198,35 @@ You don't need to write your application in a particular way to make Sprout work
 outside anything required by the resolver or provider, though those are mostly architectural limitations.
 There are only two additional things to be aware of beyond this.
 
-1. If you're using Eloquent for your tenant, your [tenant-owned models](tenant-child-models) will require the usage of a trait to hook into the automation.
-2. The [storage](storage) and [cache](cache) service overrides will require you to create a tenant disk and store, respectively. The specifics of this can be found in their documentation.
+1. If you're using Eloquent for your tenant, your [tenant-owned models][25] will require the usage of a trait to hook into the automation.
+2. The [storage][26] and [cache][27] service overrides will require you to create a tenant disk and store, respectively. The specifics of this can be found in their documentation.
 
 Happy building!
+
+[1]:	https://packagist.org/packages/league/flysystem-path-prefixing
+[2]:	https://packagist.org/packages/sprout/sprout
+[3]:	configuration#sprout-config
+[4]:	service-overrides
+[5]:	storage
+[6]:	jobs
+[7]:	cache
+[8]:	auth
+[9]:	cookies
+[10]:	sessions
+[11]:	custom-service-override
+[12]:	configuration#multitenancy-config
+[13]:	subdomain
+[14]:	path
+[15]:	header
+[16]:	cookie
+[17]:	session
+[18]:	https://laravel.com/docs/11.x/authentication#adding-custom-user-providers
+[19]:	eloquent
+[20]:	database
+[21]:	tenant-models
+[22]:	custom-tenant-provider
+[23]:	https://laravel.com/docs/11.x/authentication#adding-custom-guards
+[24]:	configuration#tenancy-options
+[25]:	tenant-child-models
+[26]:	storage
+[27]:	cache
