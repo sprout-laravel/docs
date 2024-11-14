@@ -7,8 +7,6 @@ description:
   Sprout has a handful of configuration options, and while they are all set to sensible defaults, it's worth understanding what each of them does.
 ---
 
-[[TOC]]
-
 ## Introduction
 
 Sprout comes with two config files, `sprout.php` and `multitenancy.php`.
@@ -25,9 +23,135 @@ The config is also tagged as `config` and `sprout-config`, if you prefer to publ
 The first of the two config files is `multitenancy.php` which is where you configure your multitenancy implementation.
 If you've ever had to work with Laravel's `auth.php` config file, some of this may be familiar to you.
 
+### Multitenancy Defaults
+
+The first option within the multitenancy config is `defaults`, which functions identically to `auth.defaults`.
+
+```php
+'defaults' => [
+    'tenancy'  => 'tenants',
+    'provider' => 'tenants',
+    'resolver' => 'subdomain',
+],
+```
+
+This option allows you to set the default tenancy,
+provider and resolver that will be used in several places if one wasn't explicitly provided.
+
+### Tenancies
+
+The next open is `tenancies`, which lets you configure the different [tenancies][1] that your application
+has.
+For most applications, you'll only have one type of tenant, so you'll only have one tenancy.
+
+```php
+'tenancies' => [
+    'tenants' => [
+        'provider' => 'tenants',
+        'options'  => [
+            TenancyOptions::hydrateTenantRelation(),
+            TenancyOptions::throwIfNotRelated(),
+        ],
+    ],
+],
+```
+
+Every tenancy can have a `provider`, and an array of `options`. Both of these config options are entirely optional.
+
+#### Tenancy Provider
+
+The `provider` option within a tenancy config will tell Sprout which tenancy provider to use.
+The value should match the name of a tenancy provider configured in the next section of the config.
+
+If the value is `null`,
+or the entry is missing entirely, the default tenancy provider defined in `multitenancy.defaults.provider` will be used.
+
+#### Tenancy Options
+
+The `options` option within a tenancy config allows you finer control over the behaviour of a particular tenancy.
+Options are provided by the `Sprout\TenancyOptions` class, which currently provides two options.
+
+- `TenancyOptions::hydrateTenantRelation()` — Tells Sprout to automatically hydrate the tenant relation of a retrieved
+  model with the current tenant.
+- `TenancyOptions::throwIfNotRelated()` — Tells Sprout to throw an exception if a model retrieved from the database, or
+  attempting to be created doesn't relate to the current tenant.
+
+### Tenancy Providers
+
+Following on from tenancies, the next option within the multitenancy config file is `providers`,
+which allows you to configure separate [tenancy providers][2].
+Tenancy providers are
+
+```php
+'providers' => [
+    'tenants' => [
+        'driver' => 'eloquent',
+        'model'  => \Sprout\Database\Eloquent\Tenant::class,
+    ],
+    // 'backup' => [
+    //     'driver' => 'database',
+    //     'table'  => 'tenants',
+    // ],
+],
+```
+
+A tenant provider requires a `driver`, with all other options being dictated by the driver you choose.
+The following drivers are supported out of the box:
+
+- [`eloquent`][3]
+- [`database`][4]
+
+### Identity Resolvers
+
+Finally,
+we have the `resolvers` option, which is where you can configure the
+different [identity resolvers][5]
+that you require in your application.
+Identity resolvers are classes responsible for location a tenants' identifier within a request,
+and they are not tied to a specific provider or tenancy.
+
+```php
+'resolvers' => [
+    'subdomain' => [
+        'driver'  => 'subdomain',
+        'domain'  => env('TENANTED_DOMAIN'),
+        'pattern' => '.*',
+    ],
+    'header' => [
+        'driver' => 'header',
+        'header' => '{Tenancy}-Identifier',
+    ],
+    'path' => [
+        'driver'  => 'path',
+        'segment' => 1,
+    ],
+    'cookie' => [
+        'driver' => 'cookie',
+        'cookie' => '{Tenancy}-Identifier',
+    ],
+    'session' => [
+        'driver'  => 'session',
+        'session' => 'multitenancy.{tenancy}',
+    ],
+],
+```
+
+An identity resolver requires a `driver`, with all other options being dictated by the driver you pick.
+The following drivers are supported out of the box:
+
+- [`subdomain`][6]
+- [`header`][7]
+- [`path`][8]
+- [`cookie`][9]
+- [`session`][10]
+
+It should be noted that the default names are there for simplicity, and you may change them to whatever you see fit.
+It is also recommended that you remove any you don't plan to use.
+
 ## Sprout Config
 
-The second of the two config files is `sprout.php` which contains configuration specific to the general running of Sprout
+The second of the two config files is `sprout.php` which contains configuration specific to the general running of
+Sprout
 itself.
 This file has three separate config options.
 
@@ -103,17 +227,17 @@ php artisan make:listener MyTenancyBootstrapper --event="\\Sprout\\Events\\Curre
 
 The `SetCurrentTenantContext` bootstrapper ensures
 that the current tenant for all active tenancies has their key present
-within [Laravel's context][1].
+within [Laravel's context][11].
 The context key is `sprout.tenants`,
 which contains an array of `tenancy => key` mappings,
 where `tenancy` is the name of the tenancy configured in `multitenancy.tenancies`, and `key` is the tenant's key.
 
 #### `PerformIdentityResolverSetup`
 
-Some [identity resolvers][2] have actions that should be performed
+Some [identity resolvers][12] have actions that should be performed
 when a tenancy is bootstrapped off the back of them.
 For example,
-[parameter-based identity resolvers][3] will set default values for the route
+[parameter-based identity resolvers][13] will set default values for the route
 parameters,
 so you don't have to manually provide them when generating a route URL.
 
@@ -122,7 +246,7 @@ so you don't have to manually provide them when generating a route URL.
 Since Sprout allows you to switch the current tenant during a request,
 it's entirely possible that a single request bootstraps two tenants tenancies.
 Because of this,
-Sprouts [service overrides][4] can have clean-up actions to prevent tenant configuration,
+Sprouts [service overrides][14] can have clean-up actions to prevent tenant configuration,
 services and set-ups from leaking.
 
 > [!WARNING]
@@ -132,14 +256,14 @@ services and set-ups from leaking.
 #### `SetupServiceOverrides`
 
 This particular bootstrapper is responsible
-for allowing [service overrides][5] to perform their various setup actions.
+for allowing [service overrides][15] to perform their various setup actions.
 Not all overrides will have setup actions,
 but if they do, what they are will depend entirely on the service they're overriding.
 
 ### Services
 
 The final option in the Sprout config is `services`,
-which contains the [service overrides][6] that should be enabled for the application.
+which contains the [service overrides][16] that should be enabled for the application.
 
 ```php
 'services' => [
@@ -172,22 +296,32 @@ You can find out more about the individual service overrides from within their d
 
 The following are available as part of Sprout:
 
-- [Storage][7]
-- [Jobs][8]
-- [Cache][9]
-- [Auth][10]
-- [Cookies][11]
-- [Sessions][12]
+- [Storage][17]
+- [Jobs][18]
+- [Cache][19]
+- [Auth][20]
+- [Cookies][21]
+- [Sessions][22]
 
-[1]:	https://laravel.com/docs/11.x/context
-[2]:	1.x/identity-resolvers
-[3]:	1.x/identity-resolvers#parameter-based
-[4]:	1.x/service-overrides
-[5]:	1.x/service-overrides
-[6]:	1.x/service-overrides
-[7]:	1.x/storage
-[8]:	1.x/jobs
-[9]:	1.x/cache
-[10]:	1.x/auth
-[11]:	1.x/cookies
-[12]:	1.x/sessions
+[1]:	1.x/tenancies
+[2]:	1.x/tenancy-providers
+[3]:	1.x/eloquent
+[4]:	1.x/database
+[5]:	1.x/identity-resolvers
+[6]:	1.x/subdomain
+[7]:	1.x/header
+[8]:	1.x/path
+[9]:	1.x/cookie
+[10]:	1.x/session
+[11]:	https://laravel.com/docs/11.x/context
+[12]:	1.x/identity-resolvers
+[13]:	1.x/identity-resolvers#parameter-based
+[14]:	1.x/service-overrides
+[15]:	1.x/service-overrides
+[16]:	1.x/service-overrides
+[17]:	1.x/storage
+[18]:	1.x/jobs
+[19]:	1.x/cache
+[20]:	1.x/auth
+[21]:	1.x/cookies
+[22]:	1.x/sessions
