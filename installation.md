@@ -75,6 +75,10 @@ Sprout ships with the following service overrides:
 - [Cookies][9]
 - [Sessions][10]
 
+> [!WARNING]
+> Some service overrides will have limitations, restrictions or possibly additional configuration steps.
+> Please read the documentation of your choice in full.
+
 By default, all are enabled and in an appropriate order.
 Since you've already asked yourself which parts of Laravel need to be made tenant-aware,
 you'll know which to comment out/delete, if any.

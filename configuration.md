@@ -20,16 +20,21 @@ php artisan vendor:publish --provider="Sprout\\SproutServiceProvider"
 
 The config is also tagged as `config` and `sprout-config`, if you prefer to publish that way.
 
+## Multitenancy Config
+
+The first of the two config files is `multitenancy.php` which is where you configure your multitenancy implementation.
+If you've ever had to work with Laravel's `auth.php` config file, some of this may be familiar to you.
+
 ## Sprout Config
 
-The first of the two config files is `sprout.php` which contains configuration specific to the general running of Sprout
+The second of the two config files is `sprout.php` which contains configuration specific to the general running of Sprout
 itself.
 This file has three separate config options.
 
 ### Enabled Hooks
 
 The `hooks` option within the Sprout config controls
-where in the lifecycle of a Laravel application Sprout should attempt to identity a tenant.
+where in the lifecycle of the Laravel application, Sprout should attempt to identity a tenant.
 
 ```php
 'hooks' => [
@@ -97,13 +102,92 @@ php artisan make:listener MyTenancyBootstrapper --event="\\Sprout\\Events\\Curre
 #### `SetCurrentTenantContext`
 
 The `SetCurrentTenantContext` bootstrapper ensures
-that the current tenant for all active tenancies has their key present within [Laravel's context](https://laravel.com/docs/11.x/context).
+that the current tenant for all active tenancies has their key present
+within [Laravel's context][1].
 The context key is `sprout.tenants`,
 which contains an array of `tenancy => key` mappings,
-where `tenancy` is the name of the tenancy configured in `multitenancy.tenancies`, and `key` is the tenants key.
+where `tenancy` is the name of the tenancy configured in `multitenancy.tenancies`, and `key` is the tenant's key.
 
 #### `PerformIdentityResolverSetup`
 
-Some [identity resolvers](1.x/identity-resolvers) have actions that should be performed
+Some [identity resolvers][2] have actions that should be performed
 when a tenancy is bootstrapped off the back of them.
-For example, [parameter-based identity resolvers](1.x/identity-resolvers#parameter-based) will 
+For example,
+[parameter-based identity resolvers][3] will set default values for the route
+parameters,
+so you don't have to manually provide them when generating a route URL.
+
+#### `CleanupServiceOverrides`
+
+Since Sprout allows you to switch the current tenant during a request,
+it's entirely possible that a single request bootstraps two tenants tenancies.
+Because of this,
+Sprouts [service overrides][4] can have clean-up actions to prevent tenant configuration,
+services and set-ups from leaking.
+
+> [!WARNING]
+> This bootstrapper should always come before the `SetupServiceOverrides`,
+> because some of Laravel's services will use old configured instances if they're still around.
+
+#### `SetupServiceOverrides`
+
+This particular bootstrapper is responsible
+for allowing [service overrides][5] to perform their various setup actions.
+Not all overrides will have setup actions,
+but if they do, what they are will depend entirely on the service they're overriding.
+
+### Services
+
+The final option in the Sprout config is `services`,
+which contains the [service overrides][6] that should be enabled for the application.
+
+```php
+'services' => [
+    // This will override the storage by introducing a 'sprout' driver
+    // that wraps any other storage drive in a tenant resource subdirectory.
+    \Sprout\Overrides\StorageOverride::class,
+    // This will hydrate tenants when running jobs, based on the current
+    // context.
+    \Sprout\Overrides\JobOverride::class,
+    // This will override the cache by introducing a 'sprout' driver
+    // that adds a prefix to cache stores for the current tenant.
+    \Sprout\Overrides\CacheOverride::class,
+    // This is a simple override that removes all currently resolved
+    // guards to prevent user auth leaking.
+    \Sprout\Overrides\AuthOverride::class,
+    // This will override the cookie settings so that all created cookies
+    // are specific to the tenant.
+    \Sprout\Overrides\CookieOverride::class,
+    // This will override the session by introducing a 'sprout' driver
+    // that wraps any other session store.
+    \Sprout\Overrides\SessionOverride::class,
+],
+```
+
+> [!NOTE]
+> The order that the service overrides appear within this list is the order that they will be added in.
+
+By default, all the available service overrides that Sprout ships with are enabled.
+You can find out more about the individual service overrides from within their documentation.
+
+The following are available as part of Sprout:
+
+- [Storage][7]
+- [Jobs][8]
+- [Cache][9]
+- [Auth][10]
+- [Cookies][11]
+- [Sessions][12]
+
+[1]:	https://laravel.com/docs/11.x/context
+[2]:	1.x/identity-resolvers
+[3]:	1.x/identity-resolvers#parameter-based
+[4]:	1.x/service-overrides
+[5]:	1.x/service-overrides
+[6]:	1.x/service-overrides
+[7]:	1.x/storage
+[8]:	1.x/jobs
+[9]:	1.x/cache
+[10]:	1.x/auth
+[11]:	1.x/cookies
+[12]:	1.x/sessions
