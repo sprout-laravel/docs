@@ -7,8 +7,6 @@ description:
   A great place to start with Sprout is its installation. In fact, installation is the number one most recommended place to start when using a package.
 ---
 
-[[TOC]]
-
 ## Requirements
 
 Sprout has three requirements.
@@ -174,7 +172,7 @@ Route::tenanted(function () {
 });
 ```
 
-This method does also allow you to specify the resolver and the tenancy in that order.
+This method does also allow you to specify the name of the resolver and the tenancy, in that order.
 
 ```php
 Route::tenanted(function () {
@@ -183,8 +181,8 @@ Route::tenanted(function () {
 ```
 
 > [!WARNING]
-> You can provide no additional options, just the resolver, or the resolver and the tenancy.
-> It is not possible to provide just the tenancy.
+> Both the resolver and tenancy name are nullable and will default to `null`.
+> If you wish to provide the tenancy name, but not the resolver, you must use `null` for the resolver.
 
 The particular identity resolver that you are using may have additional limitations,
 restrictions or requirements, so please read its documentation in full.
