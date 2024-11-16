@@ -35,7 +35,7 @@ composer require sprout/sprout
 Once you have Sprout installed, you'll want to publish the config.
 
 ```shell
-php artisan vendor:publish --provider="Sprout\\SproutServiceProvider"
+php artisan vendor:publish --provider="Sprout\SproutServiceProvider"
 ```
 
 ## Next Steps
