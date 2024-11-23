@@ -1,8 +1,8 @@
 ---
 section: Core Concepts
-title: Identity Resolvers
-position: 3
-slug: identity-resolvers
+title: Exceptions
+position: 7
+slug: exceptions
 description: 
   The Description
 ---

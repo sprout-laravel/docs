@@ -1,8 +1,8 @@
 ---
 section: Core Concepts
-title: Identity Resolvers
-position: 3
-slug: identity-resolvers
+title: Events
+position: 6
+slug: events
 description: 
   The Description
 ---

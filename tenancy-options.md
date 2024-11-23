@@ -1,8 +1,8 @@
 ---
 section: Core Concepts
-title: Identity Resolvers
-position: 3
-slug: identity-resolvers
+title: Tenancy Options
+position: 8
+slug: tenancy-options
 description: 
   The Description
 ---

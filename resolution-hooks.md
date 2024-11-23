@@ -1,8 +1,8 @@
 ---
 section: Core Concepts
-title: Identity Resolvers
-position: 3
-slug: identity-resolvers
+title: Resolution Hooks
+position: 5
+slug: resolution-hooks
 description: 
   The Description
 ---

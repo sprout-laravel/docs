@@ -1,7 +1,7 @@
 ---
 section: Core Concepts
 title: Tenancies
-position: 1
+position: 2
 slug: tenancies
 description: 
   The Description
