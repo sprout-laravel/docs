@@ -13,7 +13,7 @@ Sprout comes with two config files, `sprout.php` and `multitenancy.php`.
 You can publish these config files using Laravel's `vendor:publish` command, like so:
 
 ```shell
-php artisan vendor:publish --provider="Sprout\\SproutServiceProvider"
+php artisan vendor:publish --provider="Sprout\SproutServiceProvider"
 ```
 
 The config is also tagged as `config` and `sprout-config`, if you prefer to publish that way.
@@ -216,7 +216,7 @@ The list exists specifically so that you can control the default behaviour of bo
 Since these are simply listeners to a Sprout event, you can create your own with the following command:
 
 ```shell
-php artisan make:listener MyTenancyBootstrapper --event="\\Sprout\\Events\\CurrentTenantChanged"
+php artisan make:listener MyTenancyBootstrapper --event="Sprout\Events\CurrentTenantChanged"
 ```
 
 > [!NOTE]
