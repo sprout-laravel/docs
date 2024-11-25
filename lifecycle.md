@@ -1,8 +1,8 @@
 ---
 section: Core Concepts
-title: Events
+title: Lifecycle
 position: 6
-slug: events
+slug: lifecycle
 description: 
   The Description
 ---
