@@ -17,7 +17,7 @@ Within Sprout, it is a class that implements the `Sprout\Contracts\Tenant` inter
 
 For Sprout to function, a tenant must have an identifier and a key.
 
-### Tenant Identifier
+### Tenant Identifiers
 
 Tenant identifiers are strings that are used externally to specify the tenant.
 In the majority of cases, this value will be provided as part of the request,
