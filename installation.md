@@ -92,8 +92,9 @@ which lets you configure your implementation.
 
 #### Configure your Identity Resolver
 
-Within the `multitenancy.php` config file, there is an option `resolver`,
-which, by default, contains a resolver for all the default drivers.
+Within the `multitenancy.php` config file,
+there is an option `resolvers` which allows you to configure multiple [identity resolvers](identity-resolvers).
+By default, this contains a resolver for all the default drivers.
 These resolvers are used to resolve a tenant's identifier from a route or request,
 with each driver's name reflecting where in the request it expects to find it.
 
@@ -115,13 +116,13 @@ The default drivers are as follows:
 
 #### Configure your Tenant Provider
 
-In the same `multitenancy.php` config file, there's an option called `provider`,
-which contains the configuration for each default tenant provider driver that Sprout comes with.
+In the same `multitenancy.php` config file,
+there's an option called `provider` which allows you to configure multiple [tenant providers](tenant-providers).
 Tenant providers are used to retrieve instances of your tenant,
 whether it's an Eloquent model, simply entity, or something else.
 
 > [!TIP]
-> The tenant provider functionality is mirrored on
+> The tenant provider functionality is mirrored from
 > Laravel's [auth user provider][18] functionality.
 
 The default drivers are as follows:
@@ -137,7 +138,7 @@ For most people, their tenant will be an [Eloquent model][21].
 #### Configure your Tenancy
 
 Once you have your resolver and provider configured,
-you can finally configure your tenancy within the `tenancies` option inside the `multitenancy.php` config file.
+you can finally configure your [tenancy](tenancies) within the `tenancies` option inside the `multitenancy.php` config file.
 Tenancies are the different types of tenants your application has, and for most people, there will be only one.
 
 > [!TIP]
