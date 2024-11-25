@@ -4,7 +4,7 @@ title: Service Overrides
 position: 3
 slug: service-overrides
 description:
-  Your multitenanted application will make use of many different services, whether provided by Laravel itself, or a third-party package. These services won't know about your tenants, or even multitenancy. Service overrides allow you to customise and override some parts of these services to make them tenant-aware.
+  Your multitenanted application will make use of many services, whether provided by Laravel itself, or a third-party package. These services won't know about your tenants, or even multitenancy. Service overrides allow you to customise and override some parts of these services to make them tenant-aware.
 ---
 
 ## Introduction
@@ -29,10 +29,10 @@ and will have access to the `setup` and `cleanup` lifecycle hooks.
 
 #### The `setup` hook
 
-The [`setup` hook](lifecycle#tenancy-setup) refers to the tenancy lifecycle hook
+The [`setup` hook][1] refers to the tenancy lifecycle hook
 where the current tenant changes to a new tenant.
 This includes the changing of the tenant during a request,
-as well the initial setting of a tenant, where the previous tenant could be considered `null`.
+as well, the initial setting of a tenant, where the previous tenant, could be considered `null`.
 
 This hook is intended to be used to set up anything necessary for the multitenanted functionality,
 whether it's generic or specific to the current tenant.
@@ -43,7 +43,7 @@ public function setup(Tenancy $tenancy, Tenant $tenant): void;
 
 #### The `cleanup` hook
 
-The [`cleanup` hook](lifecycle#tenancy-cleanup) refers to the tenancy lifecycle hook where the current tenant changes,
+The [`cleanup` hook][2] refers to the tenancy lifecycle hook where the current tenant changes,
 but unlike with the `setup` hook, it's only used if there was a previous tenant.
 In situations where this hook is used, it comes before the `setup` and will always be given the previous tenant.
 
@@ -64,7 +64,7 @@ a service override can be marked as deferrable
 by implementing the `Sprout\Contracts\DeferrableServiceOverride` interface.
 
 Deferrable service overrides provide the name of a service,
-and won't be setup until after that service has been resolved using Laravel's container.
+and won't be set up until after that service has been resolved using Laravel's container.
 These service overrides will also not be instantiated (`new MyServiceOverride`) until the deferred service is loaded,
 so you can use constructor dependency injection.
 
@@ -85,7 +85,7 @@ allowing them to be "booted" once Laravel has been booted.
 
 Bootable service overrides are booted
 using
-Laravel's [booted lifecycle callback](https://github.com/laravel/framework/blob/11.x/src/Illuminate/Foundation/Application.php#L1144),
+Laravel's [booted lifecycle callback][3],
 so any non-deferred service providers will have already been booted.
 
 ```php
@@ -103,34 +103,34 @@ Sprout includes a handful of service overrides for working with Laravel's core s
 
 The file storage override registers a storage driver called `sprout`,
 which can be used to wrap/duplicate another filesystem disk, but make it tenant-aware.
-You can read more about this override [here](storage-service-override).
+You can read more about this override [here][4].
 
 ### Queued Jobs
 
 The queued job override is one of the simplest.
 When running a job, the current tenant will be set based on the value within the context.
-You can read more about this override [here](jobs-service-override).
+You can read more about this override [here][5].
 
 ### Cache Stores
 
 The cache stores override works in the same way as the file storage override.
 It adds a driver called "sprout" that lets you wrap/duplicate another cache store, but makes it tenant-aware.
-You can read more about this override [here](cache-service-override).
+You can read more about this override [here][6].
 
 ### Authentication
 
-As long as your user models are defined as [tenant child models](tenant-child-models),
+As long as your user models are defined as [tenant child models][7],
 they'll automatically be tenant-aware.
 However, the password reset handler doesn't use Eloquent models, so needs to be overridden and made tenant-aware.
-You can read more about this override [here](auth-service-override).
+You can read more about this override [here][8].
 
 ### Cookies
 
 The cookie override is, like the queued job override, implicit and requires no additional configuration.
 It does, however, only really work if you're identifying tenants using part of the URL.
 While it won't error,
-using this override in conjunction with the [cookie identity resolver](cookie-identity-resolvers) should be avoided.
-You can read more about this override [here](cookie-service-override).
+using this override with the [cookie identity resolver][9] should be avoided.
+You can read more about this override [here][10].
 
 ### Sessions
 
@@ -138,13 +138,27 @@ The session override is another implicit service override
 that works in a very similar way to the cookie override, at least in part.
 Rather than modify the defaults used to create a cookie,
 it modifies the session config in memory.
-It also wraps the default session drivers making them tenant-aware.
-You can read more about this override [here](session-service-override).
+It also wraps the default session drivers, making them tenant-aware.
+You can read more about this override [here][11].
 
 ## I need something else
 
 While the provided overrides should suffice for the core services offered by Laravel,
 that's a good chance that you'll be using something else as well.
-For these situations, you can create yourself a [custom service override](custom-service-overrides).
-There are plans to support a number of third-party packages, including Laravel's first-party offerings.
-Check out [the discussion](https://github.com/orgs/sprout-laravel/discussions/72) about it.
+For these situations, you can create yourself a [custom service override][12].
+There are plans to support many third-party packages, including Laravel's first-party offerings.
+Have a look at [the discussion][13] about it.
+
+[1]:	lifecycle#tenancy-setup
+[2]:	lifecycle#tenancy-cleanup
+[3]:	https://github.com/laravel/framework/blob/11.x/src/Illuminate/Foundation/Application.php#L1144
+[4]:	storage-service-override
+[5]:	jobs-service-override
+[6]:	cache-service-override
+[7]:	tenant-child-models
+[8]:	auth-service-override
+[9]:	cookie-identity-resolvers
+[10]:	cookie-service-override
+[11]:	session-service-override
+[12]:	custom-service-overrides
+[13]:	https://github.com/orgs/sprout-laravel/discussions/72
