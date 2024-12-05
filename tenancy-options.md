@@ -35,6 +35,19 @@ You can add the option to a tenancy using `TenancyOptions::hydrateTenantRelation
 ]
 ```
 
+To check if a tenancy has the option, you can either use the `hasOption()` method on the `Tenancy` class,
+or use the helper method on `TenancyOptions`.
+
+```php
+if (TenancyOptions::shouldHydrateTenantRelation($tenancy)) {
+
+}
+
+if ($tenancy->hasOption(TenancyOptions::hydrateTenantRelation())) {
+
+}
+```
+
 ### Throw if not related
 
 This options, whose string value is `tenant-relation.strict` controls how strict the handling
@@ -48,4 +61,17 @@ You can add the option to a tenancy using `TenancyOptions::throwIfNotRelated()`.
 'options' => [
     TenancyOptions::throwIfNotRelated(),
 ]
+```
+
+To check if a tenancy has the option, you can either use the `hasOption()` method on the `Tenancy` class,
+or use the helper method on `TenancyOptions`.
+
+```php
+if (TenancyOptions::shouldThrowIfNotRelated($tenancy)) {
+
+}
+
+if ($tenancy->hasOption(TenancyOptions::throwIfNotRelated())) {
+
+}
 ```
