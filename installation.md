@@ -38,6 +38,10 @@ Once you have Sprout installed, you'll want to publish the config.
 php artisan vendor:publish --provider="Sprout\SproutServiceProvider"
 ```
 
+> [!WARNING]
+> If you do not have auto-discovery enabled,
+> or are using a cached list of service providers, Laravel won't know about the service provider.
+
 ## Next Steps
 
 Now that you have Sprout installed, and the config files published, you can start configuring and implementing Sprout.
@@ -138,7 +142,8 @@ For most people, their tenant will be an [Eloquent model][21].
 #### Configure your Tenancy
 
 Once you have your resolver and provider configured,
-you can finally configure your [tenancy](tenancies) within the `tenancies` option inside the `multitenancy.php` config file.
+you can finally configure your [tenancy](tenancies) within the `tenancies` option inside the `multitenancy.php` config
+file.
 Tenancies are the different types of tenants your application has, and for most people, there will be only one.
 
 > [!TIP]
@@ -201,35 +206,63 @@ You don't need to write your application in a particular way to make Sprout work
 outside anything required by the resolver or provider, though those are mostly architectural limitations.
 There are only two additional things to be aware of beyond this.
 
-1. If you're using Eloquent for your tenant, your [tenant-owned models][25] will require the usage of a trait to hook into the automation.
-2. The [storage][26] and [cache][27] service overrides will require you to create a tenant disk and store, respectively. The specifics of this can be found in their documentation.
+1. If you're using Eloquent for your tenant, your [tenant-owned models][25] will require the usage of a trait to hook
+   into the automation.
+2. The [storage][26] and [cache][27] service overrides will require you to create a tenant disk and store, respectively.
+   The specifics of this can be found in their documentation.
 
 Happy building!
 
-[1]:	https://packagist.org/packages/league/flysystem-path-prefixing
-[2]:	https://packagist.org/packages/sprout/sprout
-[3]:	1.x/configuration#sprout-config
-[4]:	1.x/service-overrides
-[5]:	1.x/storage-service-override
-[6]:	1.x/jobs-service-override
-[7]:	1.x/cache-service-override
-[8]:	1.x/auth-service-override
-[9]:	1.x/cookie-service-override
-[10]:	1.x/session-service-override
-[11]:	1.x/custom-service-override
-[12]:	1.x/configuration#multitenancy-config
-[13]:	1.x/subdomain-identity-resolvers
-[14]:	1.x/path-identity-resolvers
-[15]:	1.x/header-identity-resolvers
-[16]:	1.x/cookie-identity-resolvers
-[17]:	1.x/session-identity-resolvers
-[18]:	https://laravel.com/docs/11.x/authentication#adding-custom-user-providers
-[19]:	1.x/eloquent-tenant-providers
-[20]:	1.x/database-tenant-providers
-[21]:	1.x/tenant-models
-[22]:	1.x/custom-tenant-provider
-[23]:	https://laravel.com/docs/11.x/authentication#adding-custom-guards
-[24]:	1.x/configuration#tenancy-options
-[25]:	1.x/tenant-child-models
-[26]:	1.x/storage-service-override
-[27]:	1.x/cache-service-override
+[1]:    https://packagist.org/packages/league/flysystem-path-prefixing
+
+[2]:    https://packagist.org/packages/sprout/sprout
+
+[3]:    1.x/configuration#sprout-config
+
+[4]:    1.x/service-overrides
+
+[5]:    1.x/storage-service-override
+
+[6]:    1.x/jobs-service-override
+
+[7]:    1.x/cache-service-override
+
+[8]:    1.x/auth-service-override
+
+[9]:    1.x/cookie-service-override
+
+[10]:    1.x/session-service-override
+
+[11]:    1.x/custom-service-override
+
+[12]:    1.x/configuration#multitenancy-config
+
+[13]:    1.x/subdomain-identity-resolvers
+
+[14]:    1.x/path-identity-resolvers
+
+[15]:    1.x/header-identity-resolvers
+
+[16]:    1.x/cookie-identity-resolvers
+
+[17]:    1.x/session-identity-resolvers
+
+[18]:    https://laravel.com/docs/11.x/authentication#adding-custom-user-providers
+
+[19]:    1.x/eloquent-tenant-providers
+
+[20]:    1.x/database-tenant-providers
+
+[21]:    1.x/tenant-models
+
+[22]:    1.x/custom-tenant-provider
+
+[23]:    https://laravel.com/docs/11.x/authentication#adding-custom-guards
+
+[24]:    1.x/configuration#tenancy-options
+
+[25]:    1.x/tenant-child-models
+
+[26]:    1.x/storage-service-override
+
+[27]:    1.x/cache-service-override
