@@ -138,7 +138,7 @@ An example of the error message is as follows.
 The resolution hook [Booting] is not supported
 ```
 
-## No Tenant Found
+## No Tenant Found Exception
 
 When attempting to resolve a tenant for a tenanted-route,
 if no tenant could be found, a `Sprout\Exceptions\NoTenantFoundException` will be thrown.
@@ -154,7 +154,7 @@ An example of the error message is as follows.
 No valid tenant [tenants] found [subdomain]
 ```
 
-## Tenancy Missing
+## Tenancy Missing Exception
 
 Some operations within Sprout require a current tenancy,
 and if one cannot be found, a `Sprout\Exceptions\TenancyMissingException` will be thrown with the following message.
@@ -166,7 +166,7 @@ There is no current tenancy
 This exception is primarily used by overrides and the tenant-aware drivers that they add,
 but it can be used anywhere within Sprout.
 
-## Tenant Mismatch
+## Tenant Mismatch Exception
 
 When attempting
 to save or retrieve a [tenant child model](tenant-child-models)
@@ -190,7 +190,7 @@ Model [Your\Tenant\Child\Model] already has a tenant, but it is not the current 
 > [!NOTE]
 > The `{tenancy}` part of the exception is optional, so won't always be present.
 
-## Tenant Missing
+## Tenant Missing Exception
 
 Some operations within Sprout require not only a tenant, but that a tenancy has a current tenant.
 In situations where this isn't the case, a `Sprout\Exceptions\TenantMissingException` will be thrown with a message like
@@ -208,7 +208,7 @@ There is no current tenant for tenancy [tenants]
 
 Unlike many of the other exceptions, this one is used in a wide variety of places, so could come from anywhere.
 
-## Tenant Relation
+## Tenant Relation Exception
 
 The `Sprout\Exceptions\TenantRelationException` is an exception class used in two possible ways,
 but always in reference to the tenant relation within Eloquent.
