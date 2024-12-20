@@ -69,8 +69,14 @@ These parts are provided by methods on the `Tenant` contract.
 ```php
 public function getTenantKeyName(): string;
 
-public function getTenantKey(): string;
+public function getTenantKey(): int|string;
 ```
+
+> [!NOTE]
+> You can use any value as a tenant key, as long as it can be represented by an `int` or a `string`.
+> For example, UUIDs or UULIDs are safe to use, because they can be represented as a `string`.
+> Please remember that if you're using something like a Snowflake,
+> [PHPs max int](https://www.php.net/manual/en/reserved.constants.php#constant.php-int-max) rules will still apply.
 
 ## Tenants with Resources
 
