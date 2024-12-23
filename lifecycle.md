@@ -7,6 +7,10 @@ description:
   Sprout does certain things at certain points during Laravel's lifecycle, but it also has its own lifecycle and functionality that allows you to work with it.
 ---
 
+> [!NOTE]
+> This section of the documentation is going to be one of the last pieces to be completed,
+> as it directly reflects how the package works, which is subject to change.
+
 ## Laravel Lifecycle
 
 The first lifecycle we need to look at is Laravel's, so you can see what Sprout is doing at the relevant points.
