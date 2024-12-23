@@ -1,10 +1,32 @@
 ---
 section: Packages
-title: Coming Soon
+title: First-party packages
 position: 0
-slug: packages
-description: 
-  This page intentionally has nothing on it!
+slug: first-party-packages
+description:
+  First-party packages the function as addons or extensions of Sprout
 ---
 
-This is just here for fun, as a placeholder, if you will!
+## Introduction
+
+It doesn't make sense for the core of Sprout
+to include everything that could be required within a multitenanted application,
+because that would make not only huge, but complex.
+So instead, subsets of functionality are broken up into external packages.
+
+## Seedling
+
+<img src="{{ \Illuminate\Support\Facades\Vite::asset('resources/images/seedling-logo-dark-rounded-square@2x.png') }}">
+
+Sprout Seedling is an addon/extension of Sprout that provides the tenant-specific database functionality.
+It's a
+separate package as it will have a handful of additional supporting functionality only relevant to this.
+
+## Terra
+
+<img src="{{ \Illuminate\Support\Facades\Vite::asset('resources/images/terra-logo-dark-rounded-square@2x.png') }}">
+
+Sprout Terra is an addon/extension of Sprout that provides domain supp
+ort for tenants.
+Like with Seedling, this is a separate package as it comes with more support functionality and not just
+domain identification.
