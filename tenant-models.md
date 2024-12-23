@@ -68,7 +68,7 @@ class Blog extends Model implements Tenant
 
 And there you have it, a fully working tenant model.
 Remember
-to add it to the [tenancies config](configuration#tenancies)
+to add it to the [tenant providers config](configuration#tenant-providers)
 using the [eloquent tenant provider](eloquent-tenant-providers).
 
 ### Tenant models with Resources

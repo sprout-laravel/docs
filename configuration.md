@@ -76,10 +76,10 @@ Options are provided by the `Sprout\TenancyOptions` class, which currently provi
 - `TenancyOptions::throwIfNotRelated()` — Tells Sprout to throw an exception if a model retrieved from the database, or
   attempting to be created doesn't relate to the current tenant.
 
-### Tenancy Providers
+### Tenant Providers
 
 Following on from tenancies, the next option within the multitenancy config file is `providers`,
-which allows you to configure separate [tenancy providers][2].
+which allows you to configure separate [tenant providers][2].
 Tenancy providers are
 
 ```php
