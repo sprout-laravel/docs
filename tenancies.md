@@ -21,6 +21,11 @@ dealing with a [configured tenancy](configuration#tenancies).
 These tenancies are responsible for keeping track of things like the current tenant,
 the tenant provider to use, and even how the current tenant was resolved.
 
+Sprout supports multiple different tenancies,
+which means you can a multitenanted application with multiple types of tenants,
+either entirely separate from one another or nested.
+Have a tenant that itself has multiple child tenants is definitely a rare use case, but it is supported nonetheless.
+
 ## How they work
 
 Every entry in the [`tenancies` section of the multitenancy config](configuration#tenancies) is a tenancy,
@@ -215,3 +220,89 @@ and aren't tied to the `Sprout\TenancyOptions` class, specifically to allow for 
 > Tenancy options are treated as simple boolean values, they are present, or they are not.
 > Applications will not do anything regarding a tenancy option,
 > unless code has been written specifically to make use of their presence, like with the default options.
+
+## How to work with them
+
+Sprout keeps track of each tenancy as it becomes active, treating the most recent tenancy as the current one.
+Tenancies are considered active, either when manually set as the current tenancy, or when resolution is attempted.
+Even if resolution fails, that tenancy is still active, it just doesn't have a current tenant.
+
+Sprout also provides a handful of different ways to work with tenancies.
+
+### Using an attribute
+
+Sprout comes with a contextual attribute
+that you can add to a method/function parameter to have the current tenancy injected.
+This attribute is `Sprout\Attributes\CurrentTenancy`, and requires no arguments.
+
+```php
+public function __construct(#[CurrentTenancy] Tenancy $tenancy) {
+    // Do something here
+}
+```
+
+### Using the Sprout core
+
+The core Sprout class (`Sprout\Sprout`),
+and by extension the [`sprout()` helper](helpers#sprout),
+and [`Sprout\Facades\Sprout` facade](facades#sprout) has a handful of self-explanatory methods
+for dealing with active tenancies.
+
+```php
+public function setCurrentTenancy(Tenancy $tenancy): void;
+
+public function hasCurrentTenancy(): bool;
+
+public function getCurrentTenancy(): ?Tenancy;
+
+public function getAllCurrentTenancies(): array;
+```
+
+If you want to manually set the current tenancy (append the tenancy stack), you use `setCurrentTenancy()`.
+If you want to check if there is a current tenancy, you use `hasCurrentTenancy()`,
+and if you want to get the current tenancy, or all tenancies,
+you use `getCurrentTenancy()` and `getAllCurrentTenancies()` respectively.
+
+> [!WARNING]
+> Tenancies are not marked as the "current tenancy" automatically,
+> **UNLESS** they're going through Sprouts built-in resolution process.
+> If you're doing something that requires a current tenancy,
+> but doesn't resolve the tenant, you will have to manually set the current tenancy.
+
+### Using the tenancy manager
+
+Tenancy instances are created and handled by a class known as the "Tenancy Manager".
+The tenancy manager is bound to container as a singleton using its class `Sprout\Managers\TenancyManager`,
+so is available for injection.
+It is also aliased as `sprout.tenancies` if you need to access it that way.
+The `Sprout\Sprout` class will always contain the instance of this class,
+so it can be accessed via that, the [helper](helpers#sprout) or the [facade](facades#sprout).
+
+```php
+// From the Sprout core class
+app(Sprout\Sprout::class)->tenancies();
+
+// From the Sprout helper
+sprout()->tenancies();
+
+// From the facade
+Sprout\Facades\Sprout::tenancies()
+```
+
+Full usage of the tenancy manager is an advanced topic covered in another part of the documentation,
+but for our purposes here, we only need to worry about the `get()` method.
+
+```php
+public function get(?string $name = null): Tenancy
+```
+
+This method will retrieve an already instantiated tenancy,
+instantiate a new tenancy, or throw an exception if there's a problem.
+You can give it the name
+used in the [tenancy config](configuration#tenancies) to register a particular type of tenancy,
+or leave it `null` to use the [default tenancy](configuration#multitenancy-defaults).
+This method is also accessible as a [helper](helpers#tenancy).
+
+```php
+function tenancy(?string $name = null): Tenancy;
+```
