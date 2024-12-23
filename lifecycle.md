@@ -3,6 +3,7 @@ section: Core Concepts
 title: Lifecycle
 position: 6
 slug: lifecycle
+hidden: true
 description:
   Sprout does certain things at certain points during Laravel's lifecycle, but it also has its own lifecycle and functionality that allows you to work with it.
 ---
