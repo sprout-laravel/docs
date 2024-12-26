@@ -141,7 +141,7 @@ it modifies the session config in memory.
 It also wraps the default session drivers, making them tenant-aware.
 You can read more about this override [here][11].
 
-## I need something else
+## Need something else?
 
 While the provided overrides should suffice for the core services offered by Laravel,
 that's a good chance that you'll be using something else as well.

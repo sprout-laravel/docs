@@ -173,7 +173,7 @@ You can read more about this identity resolver [here](session-identity-resolvers
 > It is only included in the spirit of making everything available to everyone,
 > I do not imagine it'll be used that often.
 
-## I need something else
+## Need something else?
 
 To the best of my knowledge, there's one potential identity resolver missing from this list,
 and it's the one that handles full domains.

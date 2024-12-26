@@ -78,7 +78,7 @@ The database tenant provider is for applications that want to use Laravel's quer
 It does require a class as a `Tenant` implementation, but Sprout comes with a default one.
 You can read more about this tenant provider [here][7].
 
-## I need something else
+## Need something else?
 
 While the provided implements should suffice for most people,
 there will be some that don't want to use Laravel's query builder or Eloquent.
