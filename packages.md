@@ -26,7 +26,13 @@ separate package as it will have a handful of additional supporting functionalit
 
 <img src="{{ \Illuminate\Support\Facades\Vite::asset('resources/images/terra-logo-dark-rounded-square@2x.png') }}">
 
-Sprout Terra is an addon/extension of Sprout that provides domain supp
-ort for tenants.
+Sprout Terra is an addon/extension of Sprout that provides domain support for tenants.
 Like with Seedling, this is a separate package as it comes with more support functionality and not just
 domain identification.
+
+## Bud
+
+<img src="{{ \Illuminate\Support\Facades\Vite::asset('resources/images/bud-logo-dark-rounded-square@2x.png') }}">
+
+Sprout Bud is an addon/extension of Sprout that provides tenant-specific configuration for Laravel's services.
+This package comes with a number of different methods for applying and storing the config.
