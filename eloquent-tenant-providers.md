@@ -16,7 +16,7 @@ It's a relatively simple tenant provider to configure and use.
 
 ## Using
 
-When configuring your provider in the [multitenancy config](configuration#tenancy-providers) you only need
+When configuring your provider in the [multitenancy config](configuration#tenant-providers) you only need
 to do two things to use this tenant provider.
 Set the driver to `eloquent` and provide a model using the `model` config option.
 An example config entry for this tenant provider looks like so:
