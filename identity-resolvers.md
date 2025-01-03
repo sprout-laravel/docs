@@ -83,7 +83,7 @@ public function resolveFromRequest(Request $request, Tenancy $tenancy): ?string;
 
 ### Route parameters
 
-Some identity resolvers function between when there's a current route, as they can use route parameters.
+Some identity resolvers can function when there's a current route, so they can use route parameters.
 This classes also implement the `Sprout\Contracts\IdentityResolverUsesParameters` interface,
 and have a `resolveFromRoute()` method.
 
