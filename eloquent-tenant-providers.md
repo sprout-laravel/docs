@@ -19,7 +19,7 @@ It's a relatively simple tenant provider to configure and use.
 When configuring your provider in the [multitenancy config](configuration#tenant-providers) you only need
 to do two things to use this tenant provider.
 Set the driver to `eloquent` and provide a model using the `model` config option.
-An example config entry for this tenant provider looks like so:
+An example config entry for this tenant provider looks like so.
 
 ```php
 'providers' => [
