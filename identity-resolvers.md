@@ -93,12 +93,15 @@ public function resolveFromRoute(Route $route, Tenancy $tenancy, Request $reques
 
 This method functions in an almost identical way, except it will use a `Route` object as well as a `Request`.
 
-This contract also provides an additional method that lets you retrieve the route parameter name that it expects,
+This contract also provides an additional method that lets you retrieve the route parameter name that it expects
 for a given tenancy.
 
 ```php
 public function getRouteParameterName(Tenancy $tenancy): string;
 ```
+
+> [!NOTE]
+> Identity resolvers that make use of route parameters **will also** still function without a route.
 
 ### The setup hook
 
