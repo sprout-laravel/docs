@@ -1,5 +1,6 @@
 ---
 section: Service Overrides
+menu: Storage
 title: Storage Service Override
 position: 0
 slug: storage-service-override
