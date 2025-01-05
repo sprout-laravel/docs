@@ -13,6 +13,9 @@ description:
 The cookie identity resolver is a driver for Sprouts [identity resolver](identity-resolvers) functionality
 that uses a cookie to identify a tenant.
 
+> [!WARNING]
+> This identity resolver does not use the URL, so you cannot generate a link for a specific tenant.
+
 ## Configuring
 
 When configuring your resolver in the [multitenancy config](configuration#identity-resolvers) you only need
@@ -53,7 +56,7 @@ which should contain a key value array of cookie options,
 which will override the values retrieved from the `session.php` config file.
 The following options are supported.
 
-| Option      | Config              | Descriptions                                                       |
+| Option      | Config              | Description                                                        |
 |-------------|---------------------|--------------------------------------------------------------------|
 | `minutes`   |                     | The number of minutes until the cookie expires                     |
 | `path`      | `session.path`      | The path the cookie should be bound to                             |
@@ -93,6 +96,3 @@ public function getRequestCookieName(Tenancy $tenancy): string
 
 The `getCookieName()` method will return the config value `header`,
 and the `getRequestCookieName()` will return the cookie name for the current tenant of the provided tenancy.
-
-> [!WARNING]
-> This identity resolver does not use the URL, so you cannot generate a link for a specific tenant.

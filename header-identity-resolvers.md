@@ -13,6 +13,9 @@ description:
 The header identity resolver is a driver for Sprouts [identity resolver](identity-resolvers) functionality
 that uses a HTTP header to identify a tenant.
 
+> [!WARNING]
+> This identity resolver does not use the URL, so you cannot generate a link for a specific tenant.
+
 ## Configuring
 
 When configuring your resolver in the [multitenancy config](configuration#identity-resolvers) you only need
@@ -79,6 +82,3 @@ public function getRequestHeaderName(Tenancy $tenancy): string
 
 The `getHeaderName()` method will return the config value `header`, 
 and the `getRequestHeaderName()` will return the header for the current tenant of the provided tenancy.
-
-> [!WARNING]
-> This identity resolver does not use the URL, so you cannot generate a link for a specific tenant.
