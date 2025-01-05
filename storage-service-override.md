@@ -44,7 +44,7 @@ the [sprout config](configuration#sprout-config).
 ],
 ```
 
-Once its registered, you need to create disk within Laravel's `filesystem.php` config file,
+Once its registered, you need to create a disk within Laravel's `filesystem.php` config file,
 specifying `sprout` as the driver.
 
 ```php
@@ -124,4 +124,5 @@ This implementation of a storage service override works based on the idea of sep
 If you require something more complex,
 like each tenant having their own disk configuration for external services like AWS S3,
 etc.,
-then it may be worth considering [Sprout Bud](first-party-packages#bud) a first party package for just such an occasion.
+then it may be worth considering [Sprout Bud](first-party-packages#bud),
+a first party package for just such an occasion.
