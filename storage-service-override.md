@@ -10,7 +10,7 @@ description:
 
 ## Introduction
 
-The storage service override is a driver for Sprouts [service override](service-overrides) functionality,
+The storage service override is an implementation of Sprouts [service override](service-overrides) functionality,
 that makes Laravel's built-in [storage/filesystem service](https://laravel.com/docs/11.x/filesystem) tenant-aware.
 The service override is [deferrable](service-overrides#deferrable-service-overrides) until the `filesystem`
 (`\Illuminate\Filesystem\FilesystemManager`) service is resolved.
