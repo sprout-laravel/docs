@@ -129,9 +129,9 @@ Route::tenanted(function () {
 
 ### Overriding Laravel
 
-Sprout comes with a number of [service overrides](#) by default, all of which are registered in
+Sprout comes with a number of [service overrides](#), all of which are registered in
 `config/sprout/overrides.php`.
-The default tenancy configuration is configured to use all the overrides, which [can be changed](#), but is
+The default tenancy configuration is configured to use all the overrides, which [can be changed](configuration#tenancy-options), but is
 fine for now.
 
 One of these overrides is the [session](#) override, which makes all sessions specific to the tenant they were created
@@ -222,7 +222,7 @@ offer.
 > application, and how it works at its core. 
 > Most of the configuration can be left as is, but it's worth exploring what it's all for.
 > 
-> [Read more about Configuration](#){:class="btn btn--sm btn--guttered"}
+> [Read more about Configuration](configuration){:class="btn btn--sm btn--guttered"}
 
 > [!CALLOUT]
 > ### Tenant Resolution
