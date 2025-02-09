@@ -1,31 +1,54 @@
 ---
-section: Getting Started
-title: Configuration
-position: 1
-slug: configuration
-description:
-  Sprout has a handful of configuration options, and while they are all set to sensible defaults, it's worth understanding what each of them does.
+description: While Sprout comes with sensible defaults meaning you'll rarely need to mess with the config, it's worth taking a look at what you can do. You never know when it'll come in handy.
 ---
 
 ## Introduction
 
-Sprout comes with two config files, `sprout.php` and `multitenancy.php`.
-You can publish these config files using Laravel's `vendor:publish` command, like so:
+Sprout comes with a handful of configuration files, all of which have sensible defaults that should work for most
+applications.
+However, it doesn't hurt to familiarise yourself with what's available to you.
+Although every effort has been taken to limit the amount of configuration required, the decision to break it down
+into smaller chunks was made, to allow for it to be more manageable.
+All Sprout config follows the standard [Laravel approach](https://laravel.com/docs/11.x/configuration), so
+can be interacted with in the same way.
 
-```shell
-php artisan vendor:publish --provider="Sprout\SproutServiceProvider"
-```
+### Multitenancy Configuration
 
-The config is also tagged as `config` and `sprout-config`, if you prefer to publish that way.
+The primary configuration for Sprout, and the one you're most likely to interact with, is the `multitenancy.php` file,
+which is published to `config/multitenancy.php`.
+This file allows you to customise the multitenanted aspects of your application, including:
 
-## Multitenancy Config
+- The tenancies it supports
+- The different tenant providers
+- The available identity resolvers
 
-The first of the two config files is `multitenancy.php` which is where you configure your multitenancy implementation.
-If you've ever had to work with Laravel's `auth.php` config file, some of this may be familiar to you.
+If you're familiar enough with Laravel's other configuration, you'll notice that this file is very similar to others,
+particularly the `auth.php` file.
+This is because the design and structure of Sprout is quite heavily based on Laravel's auth functionality.
+
+### Sprout Configuration
+
+The rest of the configuration provided by Sprout is published to the `config/sprout` directory.
+One of the main reasons this subdirectory is used, is so that addons can publish their own confirmation files to it,
+and have them available under the `sprout.` config prefix.
+By default, this directory contains:
+
+- Core Sprout configuration in `core.php`
+- Service override configuration in `overrides.php`
+
+> [!WARNING]
+> Because of how Laravel loads config files, if you create a `config/sprout.php` file, it will essentially remove
+> all of Sprouts config, causing your application to break.
+
+## Configuring
+
+Now that we've covered the different types of configuration, and where they sit on the filesystem,
+let's look into what you can actually configure.
 
 ### Multitenancy Defaults
 
-The first option within the multitenancy config is `defaults`, which functions identically to `auth.defaults`.
+The first part of the [multitenancy configuration](#multitenancy-configuration) is called `multitenancy.defaults`, 
+which functions identically to `auth.defaults`, except that it's for Sprout.
 
 ```php
 'defaults' => [
@@ -35,14 +58,16 @@ The first option within the multitenancy config is `defaults`, which functions i
 ],
 ```
 
-This option allows you to set the default tenancy,
-provider and resolver that will be used in several places if one wasn't explicitly provided.
+There are lots of different ways to interact with [tenancies](#), [tenant providers](#), and [identity resolvers](#)
+within Sprout, and this is where you can tell it, which to use by default, when none are specified.
+Remember that if you change the name of one of these, you'll need to update the `defaults` section to reflect that.
+Most of you will only be dealing with one tenancy, provider, and resolver, and here is where they'll be set.
 
 ### Tenancies
 
-The next open is `tenancies`, which lets you configure the different [tenancies][1] that your application
-has.
-For most applications, you'll only have one type of tenant, so you'll only have one tenancy.
+The next option within the [multitenancy configuration](#multitenancy-configuration) config, is `multitenancy.
+tenancies`, which lets
+you define the different tenancies that your application supports, again, similar to `auth.guards`.
 
 ```php
 'tenancies' => [
@@ -51,36 +76,52 @@ For most applications, you'll only have one type of tenant, so you'll only have 
         'options'  => [
             TenancyOptions::hydrateTenantRelation(),
             TenancyOptions::throwIfNotRelated(),
+            TenancyOptions::allOverrides(),
         ],
     ],
 ],
 ```
 
-Every tenancy can have a `provider`, and an array of `options`. Both of these config options are entirely optional.
+Tenancies are unlike tenant providers and identity resolvers, as the default implementation doesn't require any options,
+and there's no support beyond a default implementation.
+That being said, there are three possible options that can be provided.
+
+#### Tenancy Driver
+
+The `driver` option of the `tenancies` config is purely optional.
+Sprout has a default tenancy implementation, which is used when this option is missing, or set to `null`.
+You can read more about [custom tenancies here](tenancies).
+This option is missing by default.
 
 #### Tenancy Provider
 
-The `provider` option within a tenancy config will tell Sprout which tenancy provider to use.
-The value should match the name of a tenancy provider configured in the next section of the config.
-
-If the value is `null`,
-or the entry is missing entirely, the default tenancy provider defined in `multitenancy.defaults.provider` will be used.
+The `provider` option is also entirely optional, with Sprout using the provider defined in `multitenancy.defaults.
+provider` when it's missing.
+If you wish to use a different provider, or manually set configure it, this value must correspond with one from
+the [tenant providers](#tenant-providers) section.
+By default, this will be set to the `tenants` provider.
 
 #### Tenancy Options
 
-The `options` option within a tenancy config allows you finer control over the behaviour of a particular tenancy.
-Options are provided by the `Sprout\TenancyOptions` class, which currently provides two options.
+The `options` option is also optional, and when provided should be an `array`.
+The values in this array come from the `Sprout\TenancOptions` class, which act as feature flags within a tenancy.
+Values within here are do not _have to_ come from the `TenancyOptions` class, as addons and third-party packages
+may add their own here.
+By default, the `tenants` tenancy has three options:
 
-- `TenancyOptions::hydrateTenantRelation()` — Tells Sprout to automatically hydrate the tenant relation of a retrieved
-  model with the current tenant.
-- `TenancyOptions::throwIfNotRelated()` — Tells Sprout to throw an exception if a model retrieved from the database, or
-  attempting to be created doesn't relate to the current tenant.
+- `hydrateTenantRelation` - This option enables to automatic hydration of the tenant relation on a [tenant child
+  model](eloquent).
+- `throwIfNotRelated` - This option will throw an exception if a tenant child model is not related to the current
+  tenant.
+- `allOverrides` - This option will allow all service overrides to be used within the tenancy.
+
+You can read more about [tenancy options here](tenancies), including which are available, and how to access them.
 
 ### Tenant Providers
 
-Following on from tenancies, the next option within the multitenancy config file is `providers`,
-which allows you to configure separate [tenant providers][2].
-Tenancy providers are
+Next comes the `multitenancy.providers` section of the [multitenancy configuration](#multitenancy-configuration), 
+which is where you can define the different tenant providers that your application supports, 
+similar to `auth.providers`.
 
 ```php
 'providers' => [
@@ -88,27 +129,25 @@ Tenancy providers are
         'driver' => 'eloquent',
         'model'  => \Sprout\Database\Eloquent\Tenant::class,
     ],
-    // 'backup' => [
-    //     'driver' => 'database',
-    //     'table'  => 'tenants',
-    // ],
 ],
 ```
 
-A tenant provider requires a `driver`, with all other options being dictated by the driver you choose.
-The following drivers are supported out of the box:
+Tenant providers are responsible for retrieving instances of your tenant for a given request, and this is where you
+can define the different ones available to you.
+Providers only require that the `driver` option is provided, with all other options being dependent on the driver
+used.
 
-- [`eloquent`][3]
-- [`database`][4]
+By default, the `eloquent` driver is used, which requires the `model` option.
+The value provided for `model` is an abstract model within Sprout, but if you've followed the
+[installation](/docs/1.x/installation#creating-your-tenant) guide, you'll have already updated this.
+You can read more about the available [tenant provider drivers here](tenants), and more about tenant providers as a
+concept [here](tenant-providers).
 
 ### Identity Resolvers
 
-Finally,
-we have the `resolvers` option, which is where you can configure the
-different [identity resolvers][5]
-that you require in your application.
-Identity resolvers are classes responsible for location a tenants' identifier within a request,
-and they are not tied to a specific provider or tenancy.
+The final part of the [multitenancy configuration](#multitenancy-configuration) is the `multitenancy.resolvers` option, 
+which is where you can define the different identity resolvers for your application.
+This feature has no corresponding component of the default auth library, as this functionality is baked into the guards.
 
 ```php
 'resolvers' => [
@@ -136,29 +175,19 @@ and they are not tied to a specific provider or tenancy.
 ],
 ```
 
-An identity resolver requires a `driver`, with all other options being dictated by the driver you pick.
-The following drivers are supported out of the box:
+By default, Sprout comes with a configuration for every identity resolver that is supported out of the box.
+Most of you won't ever need to change any of this, however, you are free to do so.
+Just like with tenant providers, identity resolvers only require the `driver` option, with the rest of the options
+depending on the driver that you use.
+You can read more about available [identity resolvers here](tenant-resolution), and more about identity resolvers as 
+a concept [here](identity-resolvers).
 
-- [`subdomain`][6]
-- [`header`][7]
-- [`path`][8]
-- [`cookie`][9]
-- [`session`][10]
+### Resolution Hooks
 
-It should be noted that the default names are there for simplicity, and you may change them to whatever you see fit.
-It is also recommended that you remove any you don't plan to use.
-
-## Sprout Config
-
-The second of the two config files is `sprout.php` which contains configuration specific to the general running of
-Sprout
-itself.
-This file has three separate config options.
-
-### Enabled Hooks
-
-The `hooks` option within the Sprout config controls
-where in the lifecycle of the Laravel application, Sprout should attempt to identity a tenant.
+Now we're over to the `config/sprout/core.php` config file, which provides some of the core sprout configuration, as 
+the name may suggest.
+The first option in this file is the `sprout.core.hooks` option, which define the locations where Sprout will 
+attempt to hook into a Laravel lifecycle to identity a tenant.
 
 ```php
 'hooks' => [
@@ -168,33 +197,16 @@ where in the lifecycle of the Laravel application, Sprout should attempt to iden
 ],
 ```
 
-The values are provided by the enum `Sprout\Support\ResolutionHook`, and the following are available:
+This option is a simple array of cases from the enum `Sprout\Support\ResolutionHook`. 
+The presence of a hook within this will control whether certain things are booted or registered.
+By default, only `Routing` and `Middleware` are enabled, as `Booting` doesn't currently do anything.
+It's there for future compatibility, so it doesn't need to be enabled, although doing so won't break anything.
+You can read more about resolution hooks [here](tenant-resolution).
 
-#### `ResolutionHook::Routing`
+### Tenancy Bootstrappers
 
-This hook will tell Sprout
-to attempt to identify tenants when receiving a `Illuminate\Routing\Events\RouteMatched` event.
-This is the recommended location for tenant identification, and will suffice for most use cases.
-
-#### `ResolutionHook::Middleware`
-
-This hook will tell Sprout to attempt to identify tenants within the middleware phase of routing.
-It is recommended
-that you keep this hook enabled
-as it allows for fallback identification should the routing approach fail for some reason.
-
-#### `ResolutionHook::Booting`
-
-This hook will tell Sprout to attempt to identify tenants during the booting of the framework,
-more specifically, in the boot phase of a service provider.
-
-> [!WARNING]
-> This hook is only present for future compatibility, and is not currently supported.
-
-### Bootstrappers
-
-The `bootstrappers` option within the Sprout config is a priority ordered list of event listeners
-that should run when a tenant becomes the current tenant.
+The last part of the core config is the `sprout.core.bootstrappers` option, which contains a collection classes that 
+should be used to bootstrap a tenancy, once a tenant becomes the active tenant.
 
 ```php
 'bootstrappers' => [
@@ -206,122 +218,61 @@ that should run when a tenant becomes the current tenant.
     \Sprout\Listeners\CleanupServiceOverrides::class,
     // Sets up service overrides for the current tenancy
     \Sprout\Listeners\SetupServiceOverrides::class,
+    // Refresh anything that's tenant-aware
+    \Sprout\Listeners\RefreshTenantAwareDependencies::class,
 ],
 ```
 
-These listeners are all for the `Sprout\Events\CurrentTenantChanged` event,
-and are registered during the boot phase of the Sprout service provider.
-The list exists specifically so that you can control the default behaviour of bootstrapping a tenancy.
+Tenancy bootstrappers are listeners that handle the `Sprout\Evnts\CurrentTenantChanged` event. 
+Any classes that are listed here will be registered as listeners for that event.
+This option only exists to give you control over the process, whether you want to remove one of these, or add your own. 
+If you are creating your own tenancy bootstrapper (event listener), you only actually need to add it to this array, 
+if you need it to be called before one of these.
 
-Since these are simply listeners to a Sprout event, you can create your own with the following command:
+### Service Overrides
 
-```shell
-php artisan make:listener MyTenancyBootstrapper --event="Sprout\Events\CurrentTenantChanged"
-```
-
-> [!NOTE]
-> If you wish to create your own bootstrapper,
-> you only need to add it to this list if the order in which it is fired is important.
-
-#### `SetCurrentTenantContext`
-
-The `SetCurrentTenantContext` bootstrapper ensures
-that the current tenant for all active tenancies has their key present
-within [Laravel's context][11].
-The context key is `sprout.tenants`,
-which contains an array of `tenancy => key` mappings,
-where `tenancy` is the name of the tenancy configured in `multitenancy.tenancies`, and `key` is the tenant's key.
-
-#### `PerformIdentityResolverSetup`
-
-Some [identity resolvers][12] have actions that should be performed
-when a tenancy is bootstrapped off the back of them.
-For example,
-[parameter-based identity resolvers][13] will set default values for the route
-parameters,
-so you don't have to manually provide them when generating a route URL.
-
-#### `CleanupServiceOverrides`
-
-Since Sprout allows you to switch the current tenant during a request,
-it's entirely possible that a single request bootstraps two tenants tenancies.
-Because of this,
-Sprouts [service overrides][14] can have clean-up actions to prevent tenant configuration,
-services and set-ups from leaking.
-
-> [!WARNING]
-> This bootstrapper should always come before the `SetupServiceOverrides`,
-> because some of Laravel's services will use old configured instances if they're still around.
-
-#### `SetupServiceOverrides`
-
-This particular bootstrapper is responsible
-for allowing [service overrides][15] to perform their various setup actions.
-Not all overrides will have setup actions,
-but if they do, what they are will depend entirely on the service they're overriding.
-
-### Services
-
-The final option in the Sprout config is `services`,
-which contains the [service overrides][16] that should be enabled for the application.
+The final part of the default configuration is the `config/sprout/overrides.php` file, which represents the
+`sprout.overrides` config option.
+Rather than having several smaller options within, this config file is the entire option itself, and lets you list out 
+the service overrides that should be registered with Sprout, as well as any necessary configuration.
 
 ```php
-'services' => [
-    // This will override the storage by introducing a 'sprout' driver
-    // that wraps any other storage drive in a tenant resource subdirectory.
-    \Sprout\Overrides\StorageOverride::class,
-    // This will hydrate tenants when running jobs, based on the current
-    // context.
-    \Sprout\Overrides\JobOverride::class,
-    // This will override the cache by introducing a 'sprout' driver
-    // that adds a prefix to cache stores for the current tenant.
-    \Sprout\Overrides\CacheOverride::class,
-    // This is a simple override that removes all currently resolved
-    // guards to prevent user auth leaking.
-    \Sprout\Overrides\AuthOverride::class,
-    // This will override the cookie settings so that all created cookies
-    // are specific to the tenant.
-    \Sprout\Overrides\CookieOverride::class,
-    // This will override the session by introducing a 'sprout' driver
-    // that wraps any other session store.
-    \Sprout\Overrides\SessionOverride::class,
-],
+return [
+    'filesystem' => [
+        'driver'    => \Sprout\Overrides\StackedOverride::class,
+        'overrides' => [
+            \Sprout\Overrides\FilesystemManagerOverride::class,
+            \Sprout\Overrides\FilesystemOverride::class,
+        ],
+    ],
+    'job' => [
+        'driver' => \Sprout\Overrides\JobOverride::class,
+    ],
+    'cache' => [
+        'driver' => \Sprout\Overrides\CacheOverride::class,
+    ],
+    'auth' => [
+        'driver'    => \Sprout\Overrides\StackedOverride::class,
+        'overrides' => [
+            \Sprout\Overrides\AuthGuardOverride::class,
+            \Sprout\Overrides\AuthPasswordOverride::class,
+        ],
+    ],
+    'cookie' => [
+        'driver' => \Sprout\Overrides\CookieOverride::class,
+    ],
+    'session' => [
+        'driver'   => \Sprout\Overrides\SessionOverride::class,
+        'database' => false,
+    ],
+];
 ```
 
-> [!NOTE]
-> The order that the service overrides appear within this list is the order that they will be added in.
+The reason this is a dedicated file is that service override configuration can start to get quite long.
+Service overrides are designed to make a "service" multitenanted.
+In the case of the default installation, this simply means components of Laravel, but would also include things like
+Livewire, Filament, Telescope, Nova, etc., etc.
 
-By default, all the available service overrides that Sprout ships with are enabled.
-You can find out more about the individual service overrides from within their documentation.
-
-The following are available as part of Sprout:
-
-- [Storage][17]
-- [Jobs][18]
-- [Cache][19]
-- [Auth][20]
-- [Cookies][21]
-- [Sessions][22]
-
-[1]:	tenancies
-[2]:	tenant-providers
-[3]:	eloquent-tenant-providers
-[4]:	database-tenant-providers
-[5]:	identity-resolvers
-[6]:	subdomain-identity-resolvers
-[7]:	header-identity-resolvers
-[8]:	path-identity-resolvers
-[9]:	cookie-identity-resolvers
-[10]:	session-identity-resolvers
-[11]:	https://laravel.com/docs/11.x/context
-[12]:	identity-resolvers
-[13]:	identity-resolvers#parameter-based
-[14]:	service-overrides
-[15]:	service-overrides
-[16]:	service-overrides
-[17]:	storage-service-override
-[18]:	jobs-service-override
-[19]:	cache-service-override
-[20]:	auth-service-override
-[21]:	cookie-service-override
-[22]:	session-service-override
+It can get even worse; when like the auth and filesystem override, they're split into multiple parts.
+To find out more about the available service overrides, as well as service overrides as a concept, check out the 
+[documentation for them](service-overrides).

@@ -1,268 +1,241 @@
 ---
-section: Getting Started
-title: Installation
-position: 0
-slug: index
-description:
-  A great place to start with Sprout is its installation. In fact, installation is the number one most recommended place to start when using a package.
+description: Install Sprout into your Laravel application and get started on your multitenancy journey.
 ---
 
-## Requirements
+## Meet Sprout
 
-Sprout has three requirements.
+Sprout is an easy to use multitenancy solution that integrates seamlessly into your Laravel application, whether it's a
+pre-existing project, or a brand new one.
+It's designed to be simple to use, and easy to understand, while still
+providing the flexibility you need to build your application the way you want.
 
-- PHP — 8.2 (`^8.2`)
-- Laravel — 11.31 (`^11.31`)
-- [Flysystem Path Prefixing][1] — 3.0 (`^3.0`)
+Multitenancy can be a complex problem to solve, with many different approaches.
+Sprout aims to support as many of these approaches as possible, in a way that takes as much of the complexity out of
+your hands as possible.
+It does this by coming with a set of defaults that you can use out of the box, but also allows you to customize and
+extend it to fit your needs.
 
-> [!NOTE]
-> The flysystem path prefixing package is only there for tenant-aware storage disks that prefix the path.
-> The decision was made to include it by default to avoid additional installation steps.
+## Making Laravel Multitenanted
 
-## Install with Composer
+To make Laravel multitenanted, you'll first need a Laravel application, or at the very least, a fresh install.
+If you don't have either of these, check out
+the [Laravel documentation](https://laravel.com/docs/11.x/installation#creating-a-laravel-project), and then come back.
 
-Sprout is available on [packagist][2] and can be installed through Composer.
+### Installing Sprout
+
+Once you have your Laravel application, you'll need to install Sprout, which can be done using composer.
 
 ```shell
 composer require sprout/sprout
 ```
 
-> [!WARNING]
-> You may have to adjust your `composer.json` if you attempt to install Sprout before its release.
+Sprout is configured to make use of Laravel's package auto-discovery, so its service provider should be automatically
+registered.
+If you have this disabled, it's not working for some reason, or you'd like to manually control where Sprout is loaded,
+you can manually register it in `bootstrap/app.php`, before your `AppServiceProvider`.
 
-## Publish Config
+```php
+return [
+    Sprout\SproutServiceProvider::class,
+    App\Providers\AppServiceProvider::class,
+];
+```
 
-Once you have Sprout installed, you'll want to publish the config.
+Sprout also comes with a handful of configuration files, which will need to be published using the following command.
 
 ```shell
 php artisan vendor:publish --provider="Sprout\SproutServiceProvider"
 ```
 
-> [!WARNING]
-> If you do not have auto-discovery enabled,
-> or are using a cached list of service providers, Laravel won't know about the service provider.
+### Creating your Tenant
 
-## Next Steps
+Now that you have Sprout installed, you can get started by creating your applications Tenant.
+Sprout supports using [Eloquent](#), or the [database](#) out of the
+box, with the ability to [extend](#) it to support other methods.
+However, for this example, we'll assume that you're using Eloquent.
 
-Now that you have Sprout installed, and the config files published, you can start configuring and implementing Sprout.
-Before you move on though, you'll want to figure out your answers to the following questions:
+To create your tenant, you'll need a model, whether that's one that already exists, or a new one.
+The model can be called whatever you like,
+but I would recommend a name that makes sense for your application, such as `Company`, `Organization`, or `Team`.
+For this example, we'll be using `Blog`.
 
-- Which of Laravel's default services/features do I want to be tenant-aware?
-- How do I want tenants to be identified? Using a subdomain? HTTP header? Session? Etc…
-- What are my tenants? Are they Eloquent models or something else?
+The model will need a [primary key](https://laravel.com/docs/11.x/eloquent#primary-keys),
+and an attribute that contains
+the tenant identifier, which we'll assume is called `identifier`.
+Once it has these, all you need to do is add the `Tenant` interface and the `IsTenant` trait to the model.
 
-Your answers to these questions will help point you in the right direction for not only using Sprout,
-but building your application.
+```php
+namespace App\Models;
 
-The following are the recommended next steps that will work in most cases.
-It's possible that your particular use-case and requirements will require additional steps,
-but will most likely include these.
+use Illuminate\Database\Eloquent\Model;
+use Sprout\Contracts\Tenant;
+use Sprout\Tenancy\IsTenant;
 
-### Configure Sprouts Core
+class Blog extends Model implements Tenant
+{
+    use IsTenant;
+}
+```
 
-Sprout comes with two config files,
-and the best one to start with is the one that [configures Sprout itself][3].
-There are three options in here, though there's only really one that you should care about at this point.
+> [!NOTE]
+> If you want to use a different attribute for the tenant identifier, you can override the `getTenantIdentifierName()`
+> method.
+> [Read more about it here](#).
 
-#### Enable Service Overrides
+With the model setup and configured as a tenant, you'll want to open up `config/multitenancy.php` and configure your
+tenancy to use the new tenant model.
+This config file provides a number of options, but comes with sensible defaults that should work for most applications.
+All you need to do right now is change the model in the `tenants` provider, to use your new model.
 
-Within the `sprout.php` config file, right at the bottom, is an option called `services`.
-This is an array that contains the [service override][4] classes that should be enabled.
-Sprout ships with the following service overrides:
+```php
+'providers' => [
+    'tenants' => [
+        'driver' => 'eloquent',
+        'model'  => \Sprout\Database\Eloquent\Tenant::class, // [tl! --]
+        'model'  => \App\Models\Blog::class, // [tl! ++]
+    ],
+],
+```
 
-- [Storage][5]
-- [Jobs][6]
-- [Cache][7]
-- [Auth][8]
-- [Cookies][9]
-- [Sessions][10]
+### Registering Tenant Routes
 
-> [!WARNING]
-> Some service overrides will have limitations, restrictions or possibly additional configuration steps.
-> Please read the documentation of your choice in full.
+The Next thing to do is register your routes that should be multitenanted.
+Before you can do that, you'll need to decide how your tenant will be identified.
+For this example, we'll be using [subdomains](#) which Sprout is configured to use by default,
+but it also supports using [paths](#), [headers](#), [the session](#) and [cookies](#).
 
-By default, all are enabled and in an appropriate order.
-Since you've already asked yourself which parts of Laravel need to be made tenant-aware,
-you'll know which to comment out/delete, if any.
+To use subdomains, you'll need to first tell the application what the main domain is, which can be done using the
+`TENANTED_DOMAIN` environment variable.
 
-> [!TIP]
-> If there's an additional part of Laravel that isn't covered here,
-> you can look at [creating a custom one][11].
+```env
+TENANTED_DOMAIN=localhost
+```
 
-### Configure your Multitenancy
-
-The second config file that comes with Sprout is the [multitenancy config][12],
-which lets you configure your implementation.
-
-#### Configure your Identity Resolver
-
-Within the `multitenancy.php` config file,
-there is an option `resolvers` which allows you to configure multiple [identity resolvers](identity-resolvers).
-By default, this contains a resolver for all the default drivers.
-These resolvers are used to resolve a tenant's identifier from a route or request,
-with each driver's name reflecting where in the request it expects to find it.
-
-The default drivers are as follows:
-
-> [!WARNING]
-> Some identity resolvers will have limitations and restrictions regarding other features within Sprout or
-> Laravel itself.
-> Please read the documentation of your choice in full.
-
-- [Subdomain][13]
-- [Path][14]
-- [Header][15]
-- [Cookie][16]
-- [Session][17]
-
-> [!TIP]
-> For simplicity, it is recommended that you remove any that you don't currently need.
-
-#### Configure your Tenant Provider
-
-In the same `multitenancy.php` config file,
-there's an option called `provider` which allows you to configure multiple [tenant providers](tenant-providers).
-Tenant providers are used to retrieve instances of your tenant,
-whether it's an Eloquent model, simply entity, or something else.
-
-> [!TIP]
-> The tenant provider functionality is mirrored from
-> Laravel's [auth user provider][18] functionality.
-
-The default drivers are as follows:
-
-- [Eloquent][19]
-- [Database][20]
-
-For most people, their tenant will be an [Eloquent model][21].
-
-> [!TIP]
-> Should you wish to use something else as your tenant, you can look into [creating a custom tenant provider][22].
-
-#### Configure your Tenancy
-
-Once you have your resolver and provider configured,
-you can finally configure your [tenancy](tenancies) within the `tenancies` option inside the `multitenancy.php` config
-file.
-Tenancies are the different types of tenants your application has, and for most people, there will be only one.
-
-> [!TIP]
-> The tenancies' functionality is mirrored on
-> Laravel's [auth guard][23] functionality.
-
-For your tenancy,
-you'll want to set the provider you're using, which will be the one from the previous step,
-as well as the [tenancy options][24].
-The tenancy options configure some base functionality and behaviour of a tenancy.
-You can read more about those in the configuration part of the documentation,
-but for most people, the default ones you see should suffice.
-
-#### Set the defaults
-
-Finally, you'll want to go to the `defaults` option within the `multitenancy.php` file,
-and update each with the name of the resolver, provider, and tenancy you just configured.
-This step is entirely optional,
-but, like with Laravel's auth functionality, this allows you to skip the manual providing of configuration names.
-
-### Setting up Routes
-
-Now that you're all configured, and you have your tenant,
-whether that's an Eloquent model or something else, you're almost ready to start building.
-Whatever you're building, you're most likely going to need some routes that require a tenant.
-
-Fortunately, Sprout adds a helper method to the `Route` facade that makes creating tenanted routes simple.
+Finally, you can open your `routes/web.php` file and add your tenant routes using the Sprout route macro.
 
 ```php
 Route::tenanted(function () {
-    // Define tenant routes here
-});
+    Route::get('/', function () {
+        return view('welcome');
+    });
+})
 ```
 
-This method does also allow you to specify the name of the resolver and the tenancy, in that order.
+> [!TIP]
+> If you're using the `subdomain` resolver, and you intend to have routes within your application that are not
+> multitenanted, you'll want to wrap those routes in a route group that uses the main applications domain.
+> If you don't do this, those routes will also be available under tenants subdomains, which can cause issues.
+> [Read more about it here](#).
+
+### Overriding Laravel
+
+Sprout comes with a number of [service overrides](#) by default, all of which are registered in
+`config/sprout/overrides.php`.
+The default tenancy configuration is configured to use all the overrides, which [can be changed](#), but is
+fine for now.
+
+One of these overrides is the [session](#) override, which makes all sessions specific to the tenant they were created
+under.
+By default, Laravel is set to use the `database` session driver, and it creates the table in a
+[default migration](https://github.com/laravel/laravel/blob/11.x/database/migrations/0001_01_01_000000_create_users_table.php#L30-L37)
+that comes with the Laravel installation.
+If you plan to continue with this driver, you'll need to add two columns to the `sessions` table.
 
 ```php
-Route::tenanted(function () {
-    // Define tenant routes here
-}, 'subdomain', 'tenancy');
+$table->string('tenancy')->nullable();
+$table->bigInt('tenant_id')->nullable();
 ```
 
-> [!WARNING]
-> Both the resolver and tenancy name are nullable and will default to `null`.
-> If you wish to provide the tenancy name, but not the resolver, you must use `null` for the resolver.
+> [!NOTE]
+> The `tenant_id` column should match the primary key of your tenant model, which by default within Laravel would
+> be `BIGINT`, which is why `bigInt()` is used here.
 
-The particular identity resolver that you are using may have additional limitations,
-restrictions or requirements, so please read its documentation in full.
+The only other thing to consider here is that if you encounter CSRF issues when you first get started, clear your
+cookies in your browser, and it'll fix the issue.
+Unfortunately, this is a bug to do with Laravel's cookie handling if you access a CSRF protected route before Sprout
+is fully setup and working.
+Sadly, it's not something that Sprout can fix.
 
-An example of this is
-that the subdomain driver will require the non-tenanted routes
-to be wrapped in a route group that explicitly sets the domain name.
-This is to avoid non-tenanted routes being made available within tenancies.
+### Tenant Child Models
 
-### Start Building
+You've got your tenant, Laravel knows how to identify it, and which routes should be multitenanted.
+Everything is all working and ready to go, except your tenant model needs some child models.
+Since the tenant is `Blog`, it makes sense that one of its child models would be `Post`.
 
-Now you're all configured, and you've got a place to define your routes, so you can start building your application!
+```php
+namespace App\Models;
 
-You don't need to write your application in a particular way to make Sprout work,
-outside anything required by the resolver or provider, though those are mostly architectural limitations.
-There are only two additional things to be aware of beyond this.
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-1. If you're using Eloquent for your tenant, your [tenant-owned models][25] will require the usage of a trait to hook
-   into the automation.
-2. The [storage][26] and [cache][27] service overrides will require you to create a tenant disk and store, respectively.
-   The specifics of this can be found in their documentation.
+class Post extends Model
+{
+    public function blog(): BelongsTo
+    {
+        return $this->belongsTo(Blog::class);
+    }
+}
+```
 
-Happy building!
+All that we need to do to hook this model into the multitenancy functionality is add the `BelongsToTenant` trait,
+and mark the tenant relation with the `TenantRelation` attribute.
 
-[1]:    https://packagist.org/packages/league/flysystem-path-prefixing
+```php
+namespace App\Models;
 
-[2]:    https://packagist.org/packages/sprout/sprout
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Sprout\Attributes\TenantRelation;
+use Sprout\Database\Eloquent\Concerns\BelongsToTenant;
 
-[3]:    1.x/configuration#sprout-config
+class Post extends Model
+{
+    use BelongsToTenant; // [tl! ++]
+    
+    #[TenantRelation] // [tl! ++]
+    public function blog(): BelongsTo
+    {
+        return $this->belongsTo(Blog::class);
+    }
+}
+```
 
-[4]:    1.x/service-overrides
+This model is now part of the multitenancy functionality.
+All `Post` that are loaded will automatically be scoped to the current `Blog`, and any new `Post` created will
+automatically be associated with the current `Blog`.
 
-[5]:    1.x/storage-service-override
+> [!TIP]
+> It may be worth creating a base abstract `BlogModel` that defines your tenant relation and uses the trait, to
+> avoid repeating yourself.
+> Then all your child models can extend it and inherit the multitenancy configuration.
 
-[6]:    1.x/jobs-service-override
+## What's next?
 
-[7]:    1.x/cache-service-override
+You've now got a multitenanted Laravel application, and you can get on with building it.
+It's possible for you to carry on without ever touching Sprout again, besides the odd model trait here or there.
+However, there is a lot more that's available to you, so at the very least, it's worth exploring what Sprout has to
+offer.
 
-[8]:    1.x/auth-service-override
+> [!CALLOUT]
+> ### Configuration
+> Sprout comes with a couple of configuration files, that allow you to customise how Sprout interacts with your
+> application, and how it works at its core. 
+> Most of the configuration can be left as is, but it's worth exploring what it's all for.
+> 
+> [Read more about Configuration](#){:class="btn btn--sm btn--guttered"}
 
-[9]:    1.x/cookie-service-override
+> [!CALLOUT]
+> ### Tenant Resolution
+> Sprout comes with a number of resolvers that can be used to identify your tenant,
+> as well as the ability to create your own.
+> It's worth exploring these, so you can figure out which ones you need, as Sprout lets you use as many as you need.
+> 
+> [Read more about Tenant Resolution](#){:class="btn btn--sm btn--guttered"}
 
-[10]:    1.x/session-service-override
-
-[11]:    1.x/custom-service-override
-
-[12]:    1.x/configuration#multitenancy-config
-
-[13]:    1.x/subdomain-identity-resolvers
-
-[14]:    1.x/path-identity-resolvers
-
-[15]:    1.x/header-identity-resolvers
-
-[16]:    1.x/cookie-identity-resolvers
-
-[17]:    1.x/session-identity-resolvers
-
-[18]:    https://laravel.com/docs/11.x/authentication#adding-custom-user-providers
-
-[19]:    1.x/eloquent-tenant-providers
-
-[20]:    1.x/database-tenant-providers
-
-[21]:    1.x/tenant-models
-
-[22]:    1.x/custom-tenant-provider
-
-[23]:    https://laravel.com/docs/11.x/authentication#adding-custom-guards
-
-[24]:    1.x/configuration#tenancy-options
-
-[25]:    1.x/tenant-child-models
-
-[26]:    1.x/storage-service-override
-
-[27]:    1.x/cache-service-override
+> [!CALLOUT]
+> ### Service Overrides
+> Sprout comes with several service overrides that allow you to make Laravels core services tenant-aware, with
+> the ability to create your own.
+> Read about the ones that are enabled by default, how you can best use them.
+> 
+> [Read more about Service Overrides](#){:class="btn btn--sm btn--guttered"}
