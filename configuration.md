@@ -29,16 +29,12 @@ This is because the design and structure of Sprout is quite heavily based on Lar
 ### Sprout Configuration
 
 The rest of the configuration provided by Sprout is published to the `config/sprout` directory.
-One of the main reasons this subdirectory is used, is so that addons can publish their own confirmation files to it,
-and have them available under the `sprout.` config prefix.
+One of the main reasons this subdirectory is used, is so that addons can publish their own configuration files to it,
+making them available under the `sprout.` config prefix.
 By default, this directory contains:
 
 - Core Sprout configuration in `core.php`
 - Service override configuration in `overrides.php`
-
-> [!WARNING]
-> Because of how Laravel loads config files, if you create a `config/sprout.php` file, it will essentially remove
-> all of Sprouts config, causing your application to break.
 
 ## Configuring
 

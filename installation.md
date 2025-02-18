@@ -69,7 +69,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Sprout\Contracts\Tenant;
-use Sprout\Tenancy\IsTenant;
+use Sprout\Database\Eloquent\Concerns\IsTenant;
 
 class Blog extends Model implements Tenant
 {
@@ -78,9 +78,8 @@ class Blog extends Model implements Tenant
 ```
 
 > [!NOTE]
-> If you want to use a different attribute for the tenant identifier, you can override the `getTenantIdentifierName()`
-> method.
-> [Read more about it here](#).
+> If you want to use a different attribute other than `identifier` for the tenant identifier, you can find out how to
+> go about that [here](tenants#tenant-models).
 
 With the model setup and configured as a tenant, you'll want to open up `config/multitenancy.php` and configure your
 tenancy to use the new tenant model.
@@ -230,7 +229,7 @@ offer.
 > as well as the ability to create your own.
 > It's worth exploring these, so you can figure out which ones you need, as Sprout lets you use as many as you need.
 > 
-> [Read more about Tenant Resolution](#){:class="btn btn--sm btn--guttered"}
+> [Read more about Tenant Resolution](tenant-resolution){:class="btn btn--sm btn--guttered"}
 
 > [!CALLOUT]
 > ### Service Overrides
@@ -238,4 +237,4 @@ offer.
 > the ability to create your own.
 > Read about the ones that are enabled by default, how you can best use them.
 > 
-> [Read more about Service Overrides](#){:class="btn btn--sm btn--guttered"}
+> [Read more about Service Overrides](service-overrides){:class="btn btn--sm btn--guttered"}
