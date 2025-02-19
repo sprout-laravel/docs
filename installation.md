@@ -50,8 +50,8 @@ php artisan vendor:publish --provider="Sprout\SproutServiceProvider"
 ### Creating your Tenant
 
 Now that you have Sprout installed, you can get started by creating your applications Tenant.
-Sprout supports using [Eloquent](#), or the [database](#) out of the
-box, with the ability to [extend](#) it to support other methods.
+Sprout supports using [Eloquent](tenants#eloquent-tenant-provider), or the [database](tenants#database-tenant-provider) 
+out the box, with the ability to [extend](tenant-providers#custom-tenant-providers) it to support other methods.
 However, for this example, we'll assume that you're using Eloquent.
 
 To create your tenant, you'll need a model, whether that's one that already exists, or a new one.
@@ -100,8 +100,9 @@ All you need to do right now is change the model in the `tenants` provider, to u
 
 The Next thing to do is register your routes that should be multitenanted.
 Before you can do that, you'll need to decide how your tenant will be identified.
-For this example, we'll be using [subdomains](#) which Sprout is configured to use by default,
-but it also supports using [paths](#), [headers](#), [the session](#) and [cookies](#).
+For this example, we'll be using [subdomains](tenant-resolution#using-subdomains) which Sprout is configured to use by default,
+but it also supports using [paths](tenant-resolution#using-the-path), [headers](tenant-resolution#using-headers), 
+[the session](tenant-resolution#using-the-session) and [cookies](tenant-resoultion#using-cookies).
 
 To use subdomains, you'll need to first tell the application what the main domain is, which can be done using the
 `TENANTED_DOMAIN` environment variable.
@@ -124,17 +125,17 @@ Route::tenanted(function () {
 > If you're using the `subdomain` resolver, and you intend to have routes within your application that are not
 > multitenanted, you'll want to wrap those routes in a route group that uses the main applications domain.
 > If you don't do this, those routes will also be available under tenants subdomains, which can cause issues.
-> [Read more about it here](#).
+> [Read more about it here](tenant-resolution#using-subdomains).
 
 ### Overriding Laravel
 
-Sprout comes with a number of [service overrides](#), all of which are registered in
+Sprout comes with a number of [service overrides](service-overrides), all of which are registered in
 `config/sprout/overrides.php`.
 The default tenancy configuration is configured to use all the overrides, which [can be changed](configuration#tenancy-options), but is
 fine for now.
 
-One of these overrides is the [session](#) override, which makes all sessions specific to the tenant they were created
-under.
+One of these overrides is the [session](service-overrides#overriding-sessions) override,
+which makes all sessions specific to the tenant they were created under.
 By default, Laravel is set to use the `database` session driver, and it creates the table in a
 [default migration](https://github.com/laravel/laravel/blob/11.x/database/migrations/0001_01_01_000000_create_users_table.php#L30-L37)
 that comes with the Laravel installation.

@@ -10,7 +10,8 @@ return [
         ],
 
         'Core Concepts' => [
-            'Tenants' => 'tenants',
-        ]
+            'Tenants'           => 'tenants',
+            'Tenant Resolution' => 'tenant-resolution',
+        ],
     ],
 ];

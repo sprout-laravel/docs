@@ -54,8 +54,10 @@ which functions identically to `auth.defaults`, except that it's for Sprout.
 ],
 ```
 
-There are lots of different ways to interact with [tenancies](#), [tenant providers](#), and [identity resolvers](#)
-within Sprout, and this is where you can tell it, which to use by default, when none are specified.
+There are lots of different ways to interact with [tenancies](tenants#tenancies), 
+[tenant providers](tenants#tenant-providers),
+and [identity resolvers](tenant-resolution)within Sprout, and this is where you can tell 
+it, which to use by default, when none are specified.
 Remember that if you change the name of one of these, you'll need to update the `defaults` section to reflect that.
 Most of you will only be dealing with one tenancy, provider, and resolver, and here is where they'll be set.
 
