@@ -1,11 +1,7 @@
 ---
-description: At the core of every multitenanted application is the tenant. Tenants are entities, but, they
+description: At the core of every multitenanted application is the tenant. Tenants are entities, but they
   also require supporting functionality to simplify working with them.
 ---
-
-> [!CALLOUT]
-> The documentation is still in progress, and this page is not yet complete.
-> Please check back again in the future.
 
 ## Introduction
 
@@ -111,9 +107,9 @@ Tenants can be anything within Sprout, though how their data is read and written
 a custom [tenant provider](#tenant-providers).
 Unless you want to use the database without Eloquent.
 In that case, Sprout comes with a
-[`GenericTenant` class](https://github.com/sprout-laravel/sprout/blob/1.x/src/Support/GenericTenant.php), that can be
-used as your tenant, or form the base of it.
-If you wish to use the database directly, you'll want to use the [database tenant provider](#database-tenant-provider).
+[`GenericTenant` class](https://github.com/sprout-laravel/sprout/blob/1.x/src/Support/GenericTenant.php) entity that 
+acts as your tenant implementation, or forms the base of it.
+If you wish to use the database directly, there's the [database tenant provider](#database-tenant-provider).
 
 > [!TIP]
 > You can provide an Eloquent model class for the `table` option, and the database driver will use the models
@@ -126,7 +122,7 @@ Some features within Sprout require that a tenant has resources, which is mostly
 and filesystems.
 These features require that the tenant also implements the `Sprout\Contracts\TenantHasResources` interface, which
 requires that a tenant has a resource key.
-Tenant resource keys have the following rules:
+These keys have the following rules:
 
 - They **MUST** be unique for that type of tenant
 - They **MUST** be a `string`, or castable to a `string`
@@ -218,8 +214,7 @@ Tenant children are entities within your application that belong to a tenant.
 If `Blog` was your tenant, than `Post` and `Category` would be tenant children, as they both belong to a `Blog`.
 Sprout comes with supporting functionality that simplifies and automates the process of using Eloquent models as
 tenant children.
-When creating your tenant child model, you can implement one of two traits, depending on how it
-relates to the tenant.
+When creating these models, you can implement one of two traits, depending on how it relates to the tenant.
 
 - `Sprout\Database\Eloquent\Concern\BelongsToTenant` - The model belongs to a single tenant.
 - `Sprout\Database\Eloquent\Concern\BelongsToManyTenants` - The model belongs to many tenants.
@@ -339,3 +334,72 @@ However, if you're using a third-party (or maybe first-party) addon that adds su
 it is likely that will come with supporting functionality, and you'd need to look at its documentation for details.
 
 ## Tenancies
+
+Tenancies are Sprouts version of Laravel's auth guards. 
+Auth guards are responsible for locating and retrieving the current user, as well as keeping track of them, and Sprouts
+tenancies do the same, but for tenants rather than users.
+These tenancies are defined in [the `multitenancy.tenancies` configuration](configuration#tenancies), and just like
+auth guards, you can have more than one.
+
+> [!WARNING]
+> While you can currently have multiple tenancies within your application, the behaviour of both Sprout and Laravel
+> is uncertain when layering tenancies (having subtenancies).
+> This is something that [will be looked into](https://github.com/sprout-laravel/sprout/issues/106).
+
+Tenancies are always instances of `Sprout\Contracts\Tenancy`, and Sprout ships with only one implementation, 
+`Sprout\Support\DefaultTenancy`, so unless you're using an addon or custom implementation, this will be the class
+used.
+There are a handful of ways to retrieve the current tenancy, using a 
+[contextual attribute](https://laravel.com/docs/11.x/container#contextual-attributes), a facade, or a helper function.
+
+```php
+// Using dependency injection
+public function __construct(#[CurrentTenancy] Tenancy $tenancy) {}
+
+// Using facades
+Sprout::getCurrentTenancy()
+
+// Using helper methods
+sprout()->getCurrentTenancy();
+```
+
+> [!NOTE]
+> If you want to find out more about tenancies, such as how they work, how to interact with them, and how
+> to create your own, you can check out the [tenancy documentation](tenancies).
+
+## Working with Tenants
+
+Sprout has been built to be seamless, so beyond the initial configuration and setting up, you're unlikely to encounter
+much, beyond the odd import of a Sprout class here and there.
+That being said, there are a few things that you'll need to know to work with tenants.
+
+### Tenant Context
+
+A number of Sprouts features, such as the `CurrentTenancy`and `CurrentTenant` attributes, will **only work** 
+while inside a [multitenanted context](#), with some going as far as to throw an exception if outside one.
+Out-of-the-box there are two possible places that Sprout will consider a multitenanted context.
+
+- When handling a [tenant route](#).
+  Everything beyond the first attempt to identify a tenant for the route is within 
+  the context.
+- When processing a job while the [job service override](#) is enabled.
+
+### Getting the Current Tenant
+
+Since most of the functionality around tenants is automatic and happens in the background, the tenant itself isn't
+exposed to your code, though it is available.
+The best way for you to get the tenant, is to use the 
+[contextual attribute](https://laravel.com/docs/11.x/container#contextual-attributes), 
+`Sprout\Attributes\CurrentTenant`.
+As with all contextual attributes, it doesn't care about the type of the parameter, so you can safely typehint your
+tenant model.
+
+```php
+public function __construct(#[CurrentTenant] Blog $blog) {
+    $this->blog = $blog;
+}
+```
+
+> [!WARNING]
+> Sprout does not create a binding for the class you use as a tenant, so type hinting it without the `CurrentTenant`
+> attribute will not work unless you've added something yourself to support it.
