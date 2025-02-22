@@ -12,6 +12,7 @@ return [
         'Core Concepts' => [
             'Tenants'           => 'tenants',
             'Tenant Resolution' => 'tenant-resolution',
+            'Service Overrides' => 'service-overrides',
         ],
     ],
 ];
