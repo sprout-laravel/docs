@@ -367,6 +367,76 @@ sprout()->getCurrentTenancy();
 > If you want to find out more about tenancies, such as how they work, how to interact with them, and how
 > to create your own, you can check out the [tenancy documentation](tenancies).
 
+### Tenancy Options
+
+Sprout allows you some control over the behaviour of tenancies using tenancy options.
+These options all come from the `Sprout\TenancyOptions` class, and can be added to the `options` part of the
+[tenancy config](configuration#tenancy-options).
+
+#### Hydrate Tenant Relation
+
+This option will enable the hydration of the tenant relation when retrieving child models.
+When enabled, the relation is set to the current tenant, and marked as loaded, without the need to query and retrieve
+a new model instance.
+
+```php
+'tenants' => [
+    'provider' => 'tenants',
+    'options'  => [
+        TenancyOptions::hydrateTenantRelation(),
+    ],
+],
+```
+
+#### Throw if not Related
+
+This option is also to do with child-model functionality, and tells the tenancy whether or throw an exception if the
+model being retrieved does not belong to the current tenant.
+It is recommended that this option be kept in, as it can help avoid cross-tenant data leaking.
+
+```php
+'tenants' => [
+    'provider' => 'tenants',
+    'options'  => [
+        TenancyOptions::throwIfNotRelated(),
+    ],
+],
+```
+
+#### All Overrides
+
+This option tells Sprout that all the configured [service overrides](service-overrides) should be enabled and used for
+this tenancy.
+
+```php
+'tenants' => [
+    'provider' => 'tenants',
+    'options'  => [
+        TenancyOptions::allOverrides(),
+    ],
+],
+```
+
+#### Overrides
+
+This option allows you to specify exactly which [service overrides](service-overrides) should be enabled and used
+for the tenancy.
+It takes an `array` of the service overrides name, as registered in the
+[`sprout.core.overrides` config](configuration#service-overrides).
+
+```php
+'tenants' => [
+    'provider' => 'tenants',
+    'options'  => [
+        TenancyOptions::hydrateTenantRelation(),
+        TenancyOptions::throwIfNotRelated(),
+        TenancyOptions::overrides([
+            'job', 'filesystem', 'cache'
+        ]),
+    ],
+],
+```
+
 ## Working with Tenants
 
 Sprout has been built to be seamless, so beyond the initial configuration and setting up, you're unlikely to encounter
