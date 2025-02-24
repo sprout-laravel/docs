@@ -107,7 +107,7 @@ Tenants can be anything within Sprout, though how their data is read and written
 a custom [tenant provider](#tenant-providers).
 Unless you want to use the database without Eloquent.
 In that case, Sprout comes with a
-[`GenericTenant` class](https://github.com/sprout-laravel/sprout/blob/1.x/src/Support/GenericTenant.php) entity that 
+[`GenericTenant` class](https://github.com/sprout-laravel/sprout/blob/1.x/src/Support/GenericTenant.php) entity that
 acts as your tenant implementation, or forms the base of it.
 If you wish to use the database directly, there's the [database tenant provider](#database-tenant-provider).
 
@@ -248,10 +248,10 @@ Adding this trait to your child models will have the following effects, _if_ wit
 There are also two other things that will happen, but whether each happens depends on the
 [configured tenancy options](configuration#tenancy-options).
 
-- [Throw if not Related](#) - If this tenancy option is enabled, an exception will be thrown when a model is created
-  from the database, if it belongs to a tenant other than the current active one.
-- [Hydrate Tenant Relation](#) - If this tenancy option is enabled, the tenant relation will be populated with the
-  current tenant, assuming that the model belongs to it.
+- [Throw if not Related](#throw-if-not-related) - If this tenancy option is enabled, an exception will be thrown when a
+  model is created from the database, if it belongs to a tenant other than the current active one.
+- [Hydrate Tenant Relation](#hydrate-tenant-relation) - If this tenancy option is enabled, the tenant relation will be
+  populated with the current tenant, assuming that the model belongs to it.
 
 ### Avoiding Restrictions
 
@@ -335,7 +335,7 @@ it is likely that will come with supporting functionality, and you'd need to loo
 
 ## Tenancies
 
-Tenancies are Sprouts version of Laravel's auth guards. 
+Tenancies are Sprouts version of Laravel's auth guards.
 Auth guards are responsible for locating and retrieving the current user, as well as keeping track of them, and Sprouts
 tenancies do the same, but for tenants rather than users.
 These tenancies are defined in [the `multitenancy.tenancies` configuration](configuration#tenancies), and just like
@@ -346,10 +346,10 @@ auth guards, you can have more than one.
 > is uncertain when layering tenancies (having subtenancies).
 > This is something that [will be looked into](https://github.com/sprout-laravel/sprout/issues/106).
 
-Tenancies are always instances of `Sprout\Contracts\Tenancy`, and Sprout ships with only one implementation, 
+Tenancies are always instances of `Sprout\Contracts\Tenancy`, and Sprout ships with only one implementation,
 `Sprout\Support\DefaultTenancy`, so unless you're using an addon or custom implementation, this will be the class
 used.
-There are a handful of ways to retrieve the current tenancy, using a 
+There are a handful of ways to retrieve the current tenancy, using a
 [contextual attribute](https://laravel.com/docs/11.x/container#contextual-attributes), a facade, or a helper function.
 
 ```php
@@ -445,21 +445,21 @@ That being said, there are a few things that you'll need to know to work with te
 
 ### Tenant Context
 
-A number of Sprouts features, such as the `CurrentTenancy`and `CurrentTenant` attributes, will **only work** 
+A number of Sprouts features, such as the `CurrentTenancy`and `CurrentTenant` attributes, will **only work**
 while inside a [multitenanted context](#), with some going as far as to throw an exception if outside one.
 Out-of-the-box there are two possible places that Sprout will consider a multitenanted context.
 
-- When handling a [tenant route](#).
-  Everything beyond the first attempt to identify a tenant for the route is within 
+- When handling a [tenant route](tenant-resolution#tenant-routes).
+  Everything beyond the first attempt to identify a tenant for the route is within
   the context.
-- When processing a job while the [job service override](#) is enabled.
+- When processing a job while the [job service override](service-overrides#jobs) is enabled.
 
 ### Getting the Current Tenant
 
 Since most of the functionality around tenants is automatic and happens in the background, the tenant itself isn't
 exposed to your code, though it is available.
-The best way for you to get the tenant, is to use the 
-[contextual attribute](https://laravel.com/docs/11.x/container#contextual-attributes), 
+The best way for you to get the tenant, is to use the
+[contextual attribute](https://laravel.com/docs/11.x/container#contextual-attributes),
 `Sprout\Attributes\CurrentTenant`.
 As with all contextual attributes, it doesn't care about the type of the parameter, so you can safely typehint your
 tenant model.
