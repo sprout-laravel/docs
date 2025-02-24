@@ -3,17 +3,13 @@ description: Tenant resolution is a big part of multitenancy, as it's the part t
   and loading of the current tenant. Sprout comes with a number of different options for how to go about this.
 ---
 
-> [!CALLOUT]
-> The documentation is still in progress, and this page is not yet complete.
-> Please check back again in the future.
-
 ## Introduction
 
 Tenant resolution is the process of determining the current tenant, and then resolving it before setting it as the
 actual current tenant.
 Within Sprout, there are two paths for tenant resolution, identifying, and loading.
 
-## Identifying Tenants
+## Tenant Identification
 
 Tenant identification is a process that uses the [tenant identifier](tenants#the-tenant-identifier) to identify the
 tenant.
@@ -384,4 +380,9 @@ return Application::configure(basePath: dirname(__DIR__))
 > It is extremely important that you **only do this** if you're using the session resolver, otherwise this will cause
 > issues with the [session service override](#), as well as other parts of both Laravel and Sprout.
 
-## Loading Tenants
+## Tenant Loading
+
+Tenant loading is the other side of [tenant identification](#tenant-identification), and makes use of the 
+[tenant key](tenants#the-tenant-key) rather than the identifier.
+It's also far, far simpler than identification, as it only happens internally and automatically.
+There are no specific features, drivers or settings that are needed to make use of this; it'll just work.
