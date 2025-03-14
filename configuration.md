@@ -113,7 +113,7 @@ By default, the `tenants` tenancy has three options:
   tenant.
 - `allOverrides` - This option will allow all service overrides to be used within the tenancy.
 
-You can read more about [tenancy options here](tenancies), including which are available, and how to access them.
+You can read more about [tenancy options here](tenants#tenancy-options), including which are available, and how to access them.
 
 ### Tenant Providers
 
@@ -221,7 +221,7 @@ should be used to bootstrap a tenancy, once a tenant becomes the active tenant.
 ],
 ```
 
-Tenancy bootstrappers are listeners that handle the `Sprout\Evnts\CurrentTenantChanged` event. 
+Tenancy bootstrappers are listeners that handle the `Sprout\Events\CurrentTenantChanged` event. 
 Any classes that are listed here will be registered as listeners for that event.
 This option only exists to give you control over the process, whether you want to remove one of these, or add your own. 
 If you are creating your own tenancy bootstrapper (event listener), you only actually need to add it to this array, 

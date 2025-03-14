@@ -14,5 +14,7 @@ return [
             'Tenant Resolution' => 'tenant-resolution',
             'Service Overrides' => 'service-overrides',
         ],
+
+        'Digging Deeper' => [],
     ],
 ];
