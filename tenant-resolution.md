@@ -334,7 +334,7 @@ the same mentioned in [Laravel's documentation](https://laravel.com/docs/11.x/re
 
 > [!WARNING]
 > Because of how Laravel handles cookies, it is not possible to use this identity
-> resolver, and the [cookie service override](service-overrides#cookies).
+> resolver, and the [cookie service override](service-overrides#cookie).
 > If using this resolver, with the service override enabled, an exception will be thrown during Laravel's boot phase.
 
 #### Session

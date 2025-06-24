@@ -2,10 +2,6 @@
 description: Service overrides all about making services tenant-aware, whether they're part of Laravel's core, or a third-party package.
 ---
 
-> [!CALLOUT]
-> The documentation is still in progress, and this page is not yet complete.
-> Please check back again in the future.
-
 ## Introduction
 
 Your application is made up of many "services", whether they're things like
@@ -20,7 +16,7 @@ to support your multitenancy functionality.
 This is where the service override comes in.
 Service overrides are similar to service providers, except they're specific to the lifecycle of Sprout, as well as
 that of a tenant.
-They are called when the current tenant changes, allowing them to
+They’re called when the current tenant changes, allowing them to
 set up for the new tenant, as well as clean up
 after the previous.
 They can also optionally be bootable, which means they have actions to perform once Laravel
@@ -43,7 +39,8 @@ the order they'll be called in.
 There are times when you'll need more than one service override for a service, and rather than having to register each
 under a different name, Sprout supports stacking.
 If you need to stack, you can set the driver to
-[`\Sprout\Overrides\StackedOverride`](https://github.com/sprout-laravel/sprout/blob/1.x/src/Overrides/StackedOverride.php),
+[
+`\Sprout\Overrides\StackedOverride`](https://github.com/sprout-laravel/sprout/blob/1.x/src/Overrides/StackedOverride.php),
 then provide the drivers you want to stack under the `overrides` config key.
 If either driver requires config options, you can provide them normally.
 
@@ -103,9 +100,11 @@ one, and cleaning up once it no longer is.
 While this is a core part of this feature, both the setting and cleaning up are controlled by
 [tenancy bootstrappers](configuration#tenancy-bootstrappers).
 
-The [`\Sprout\Listeners\CleanupServiceOverrides`](https://github.com/sprout-laravel/sprout/blob/1.x/src/Listeners/CleanupServiceOverrides.php)
+The [
+`\Sprout\Listeners\CleanupServiceOverrides`](https://github.com/sprout-laravel/sprout/blob/1.x/src/Listeners/CleanupServiceOverrides.php)
 bootstrapper is responsible for making the service overrides clean-up after themselves,
-and the [`\Sprout\Listeners\SetupServiceOverrides`](https://github.com/sprout-laravel/sprout/blob/1.x/src/Listeners/SetupServiceOverrides.php)
+and the [
+`\Sprout\Listeners\SetupServiceOverrides`](https://github.com/sprout-laravel/sprout/blob/1.x/src/Listeners/SetupServiceOverrides.php)
 bootstrapper is responsible for the setup.
 
 > [!WARNING]
@@ -213,13 +212,155 @@ queued.
 ```
 
 > [!NOTE]
-> This is registered as `job` because it _technically_ does do anything with the queue, and naming it something like 
+> This is registered as `job` because it _technically_ doesn't do anything with the queue, and naming it something like
 > that may get in the way or cause confusion.
 
 ### Cache
 
+The cache service override does not wrap drivers like many of the others, but instead it prefixes cache keys with the
+name of the tenancy, and the tenants’ key.
+
+```php
+'cache' => [
+    'driver' => \Sprout\Overrides\CacheOverride::class,
+],
+```
+
+To use this override, you need to create a cache store in `config/cache.php`, under `stores`, whose driver is `sprout`,
+with the store you want to override defined under the `override` config key.
+
+```php
+'tenant-store' => [
+    'driver'   => 'sprout',
+    'override' => 'file',
+],
+```
+
+If you were trying to retrieve the cache key `users.list`, the key would be something like `tenancy_8_users.list`.
+However, if the store you're overriding already has a prefix, than it will come before the tenant prefix, like this
+`prefix_tenancy_8_users.list`.
+
+> [!NOTE]
+> This override does not currently support controlling prefixes
+> through [parameter patterns](tenant-resolution#parameter-naming),
+> though there are plans to add this in the future.
+
 ### Auth
+
+The auth service override comes in two parts.
+The first replaces Laravel's password broker with Sprouts, which has Sprout-specific implementations of the cache and
+database token repositories.
+The second is called the "guard override", though all it does is ensure that all auth guards are purged when accessing
+a new tenant.
+
+```php
+'auth' => [
+    'driver'    => \Sprout\Overrides\StackedOverride::class,
+    'overrides' => [
+        \Sprout\Overrides\AuthGuardOverride::class,
+        \Sprout\Overrides\AuthPasswordOverride::class,
+    ],
+],
+```
+
+#### Auth Password Broker
+
+The Sprout-specific password broker only exists as Laravel's default one doesn’t allow you to control the resolution
+logic for its drivers.
+This manager returns Sprout-specific implementations, though they have fallback functionality and will function as
+normal if outside tenant context.
+The only thing that you need to do, if you want to use this override, with the database driver, is to add two fields
+to the `password_resets` table in the
+[default migration](https://github.com/laravel/laravel/blob/12.x/database/migrations/0001_01_01_000000_create_users_table.php#L24-L28).
+
+```php
+Schema::create('password_reset_tokens', function (Blueprint $table) {
+    $table->string('email')->primary();
+    $table->string('tenancy')->nullable();// [tl! ++]
+    $table->bigInt('tenant_id')->nullable();// [tl! ++]
+    $table->string('token');
+    $table->timestamp('created_at')->nullable();
+});
+```
+
+> [!NOTE]
+> The `tenant_id` column should match the primary key of your tenant model, which by default within Laravel would
+> be `BIGINT`, which is why `bigInt()` is used here.
 
 ### Cookie
 
+The cookie service override ensures that cookies created within a tenant context, have the appropriate settings.
+Sprout has internal settings that function almost like runtime configuration, though they keep track of contextual
+information, such as the current domain and/or path.
+
+```php
+'cookie' => [
+    'driver' => \Sprout\Overrides\CookieOverride::class,
+],
+```
+
+The [path identity resolver](tenant-resolution#path) sets the cookie path, and the
+[subdomain identity resolver](tenant-resolution#subdomain) sets the cookie domain.
+So if a cookie is created within a tenant context, and one of these identity resolvers is used, the cookie will
+have the appropriate settings.
+If there are no values set, it will default to the config values in `config/session.php`.
+
+> [!WARNING]
+> Because of how Laravel handles cookies, it is not possible to use this service override,
+> and the [cookie identity resolver](tenant-resolution#cookie).
+> If using this service override, with the identity resolver, an exception will be thrown during Laravel's boot
+> phase.
+
 ### Session
+
+The session service override replaces the default `file` (also used by `native)`, and `domain` drivers with Sprout's
+tenant-aware versions.
+If you're using `file`/`native`, the path will be prefixed using the tenants’ resource key, and if you're using the
+`database` driver, the columns `tenancy` and `tenant_id` will be populated.
+
+```php
+'session' => [
+    'driver'   => \Sprout\Overrides\SessionOverride::class,
+    'database' => false,
+],
+```
+
+> [!NOTE]
+> This service override requires that the tenant is [configured for resources](tenants#tenants-with-resources) if
+> using the `file` or `native` drivers, and will throw an exception if it isn't.
+
+> [!WARNING]
+> Because of how Laravel handles sessions, it is not possible to use this service override, and the
+> [session identity resolver](tenant-resolution#sessin).
+> If using this service override, with the identity resolver, an exception will be thrown during Laravel's boot phase.
+
+#### Database Session Handling
+
+If you haven’t followed the [installation guide](installation#overriding-laravel), you want to update the
+[default migration](https://github.com/laravel/laravel/blob/11.x/database/migrations/0001_01_01_000000_create_users_table.php#L30-L37),
+to include the tenant-specific columns.
+
+```php
+Schema::create('sessions', function (Blueprint $table) {
+    $table->string('id')->primary();
+    $table->string('tenancy')->nullable();// [tl! ++]
+    $table->bigInt('tenant_id')->nullable();// [tl! ++]
+    $table->foreignId('user_id')->nullable()->index();
+    $table->string('ip_address', 45)->nullable();
+    $table->text('user_agent')->nullable();
+    $table->longText('payload');
+    $table->integer('last_activity')->index();
+});
+```
+
+> [!TIP]
+> You can completely disable the database session handling by setting the `database` config option to `false`.
+> This exists for multi-database setups, where you wouldn’t need a tenant-scoped session driver, as the whole database
+> connection itself would be tenant-scoped.
+
+#### Config Hot-swapping
+
+Unfortunately, this service override has to hot-swap the session configuration at runtime, due to how Laravel handles
+sessions.
+I’m aware that this is not ideal, and it’s something I’ve managed to avoid everywhere else, but to circumvent it here
+would require overriding a huge chunk, if not all of, the session service.
