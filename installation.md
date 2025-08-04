@@ -32,7 +32,7 @@ composer require sprout/sprout
 Sprout is configured to make use of Laravel's package auto-discovery, so its service provider should be automatically
 registered.
 If you have this disabled, it's not working for some reason, or you'd like to manually control where Sprout is loaded,
-you can manually register it in `bootstrap/app.php`, before your `AppServiceProvider`.
+you can manually register it in `bootstrap/providers.php`, before your `AppServiceProvider`.
 
 ```php
 return [
