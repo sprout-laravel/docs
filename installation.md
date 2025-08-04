@@ -143,12 +143,12 @@ If you plan to continue with this driver, you'll need to add two columns to the 
 
 ```php
 $table->string('tenancy')->nullable();
-$table->bigInt('tenant_id')->nullable();
+$table->unsignedBigIntegereger('tenant_id')->nullable();
 ```
 
 > [!NOTE]
 > The `tenant_id` column should match the primary key of your tenant model, which by default within Laravel would
-> be `BIGINT`, which is why `bigInt()` is used here.
+> be `BIGINT`, which is why `unsignedBigInteger()` is used here.
 
 The only other thing to consider here is that if you encounter CSRF issues when you first get started, clear your
 cookies in your browser, and it'll fix the issue.
