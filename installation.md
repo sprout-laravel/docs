@@ -143,7 +143,7 @@ If you plan to continue with this driver, you'll need to add two columns to the 
 
 ```php
 $table->string('tenancy')->nullable();
-$table->unsignedBigIntegereger('tenant_id')->nullable();
+$table->unsignedBigInteger('tenant_id')->nullable();
 ```
 
 > [!NOTE]
