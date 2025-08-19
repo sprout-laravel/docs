@@ -277,7 +277,7 @@ to the `password_resets` table in the
 Schema::create('password_reset_tokens', function (Blueprint $table) {
     $table->string('email')->primary();
     $table->string('tenancy')->nullable();// [tl! ++]
-    $table->bigInt('tenant_id')->nullable();// [tl! ++]
+    $table->unsignedBigInteger('tenant_id')->nullable();// [tl! ++]
     $table->string('token');
     $table->timestamp('created_at')->nullable();
 });
@@ -285,7 +285,7 @@ Schema::create('password_reset_tokens', function (Blueprint $table) {
 
 > [!NOTE]
 > The `tenant_id` column should match the primary key of your tenant model, which by default within Laravel would
-> be `BIGINT`, which is why `bigInt()` is used here.
+> be `BIGINT`, which is why `unsignedBigInteger()` is used here.
 
 ### Cookie
 
@@ -344,7 +344,7 @@ to include the tenant-specific columns.
 Schema::create('sessions', function (Blueprint $table) {
     $table->string('id')->primary();
     $table->string('tenancy')->nullable();// [tl! ++]
-    $table->bigInt('tenant_id')->nullable();// [tl! ++]
+    $table->unsignedBigInteger('tenant_id')->nullable();// [tl! ++]
     $table->foreignId('user_id')->nullable()->index();
     $table->string('ip_address', 45)->nullable();
     $table->text('user_agent')->nullable();
